@@ -250,8 +250,8 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
         <div style={{ padding: '7%' }}>
           <Tag text={d.tag} accent={accent} />
           {onDataChange
-            ? <h1 style={{ fontSize: 'clamp(18px, 4vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2 }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
-            : <h1 style={{ fontSize: 'clamp(18px, 4vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2 }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+            ? <h1 style={{ fontSize: 'clamp(18px, 4vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(18px, 4vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
           }
           {onDataChange
             ? <p style={{ fontSize: 'clamp(10px, 1.6vw, 24px)', lineHeight: 1.7, fontWeight: 500, marginTop: 'clamp(12px, 2vw, 32px)', maxWidth: '70%', whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'body', true)}>{d.body || ''}</p>
@@ -264,11 +264,11 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
       return (
         <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <Tag text={d.tag} accent={accent} />
-          <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2 }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
           <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(16px, 4vw, 60px)', flex: 1, alignItems: 'center' }}>
             {(d.metrics || []).map((m, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 'clamp(24px, 5vw, 80px)', fontWeight: 800, letterSpacing: -3, color: accent, lineHeight: 1, textShadow: `0 0 40px ${accent}40` }}>{m.value}</div>
+                <div style={{ fontSize: 'clamp(24px, 5vw, 80px)', fontWeight: 800, letterSpacing: -3, color: accent, lineHeight: 1, textShadow: `0 0 60px ${accent}66, 0 4px 20px ${accent}40, 0 2px 12px rgba(0,0,0,0.3)` }}>{m.value}</div>
                 <div style={{ fontSize: 'clamp(7px, 1vw, 16px)', fontWeight: 700, letterSpacing: 3, color: kv.secondaryColor, marginTop: 12 }}>{m.label}</div>
               </div>
             ))}
@@ -280,7 +280,7 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
       return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '0 10%' }}>
           <Tag text={d.tag} accent={accent} />
-          <blockquote style={{ fontSize: 'clamp(16px, 4vw, 60px)', fontWeight: 800, lineHeight: 1.25, textAlign: 'center', letterSpacing: -2, maxWidth: 1000 }} dangerouslySetInnerHTML={{ __html: hl(d.quote || '', accent) }} />
+          <blockquote style={{ fontSize: 'clamp(16px, 4vw, 60px)', fontWeight: 800, lineHeight: 1.25, textAlign: 'center', letterSpacing: -2, maxWidth: 1000, textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.quote || '', accent) }} />
           {d.attribution && <div style={{ marginTop: 'clamp(12px, 2vw, 36px)', fontSize: 'clamp(8px, 1vw, 16px)', fontWeight: 600, color: kv.secondaryColor, letterSpacing: 3 }}>{d.attribution}</div>}
         </div>
       );
@@ -288,11 +288,11 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
     case 'big-number':
       return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 'clamp(8px, 1.5vw, 20px)', padding: '0 10%' }}>
-          <div style={{ fontSize: 'clamp(48px, 12vw, 180px)', fontWeight: 900, letterSpacing: -6, color: accent, lineHeight: .9, textShadow: `0 0 80px ${accent}66` }} {...editableProps(onDataChange, 'number')}>{d.number}</div>
+          <div style={{ fontSize: 'clamp(48px, 12vw, 180px)', fontWeight: 900, letterSpacing: -6, color: accent, lineHeight: .9, textShadow: `0 0 80px ${accent}66, 0 4px 20px ${accent}40, 0 2px 12px rgba(0,0,0,0.3)` }} {...editableProps(onDataChange, 'number')}>{d.number}</div>
           <div style={{ width: 1, height: 'clamp(10px, 2vw, 30px)', background: `linear-gradient(to bottom, ${accent}, transparent)` }} />
           {onDataChange
-            ? <div style={{ fontSize: 'clamp(18px, 4vw, 60px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</div>
-            : <div style={{ fontSize: 'clamp(18px, 4vw, 60px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+            ? <div style={{ fontSize: 'clamp(18px, 4vw, 60px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</div>
+            : <div style={{ fontSize: 'clamp(18px, 4vw, 60px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
           }
           {d.body && <p style={{ fontSize: 'clamp(10px, 1.5vw, 22px)', lineHeight: 1.6, fontWeight: 500, textAlign: 'center', color: kv.secondaryColor, maxWidth: '80%' }} dangerouslySetInnerHTML={{ __html: nlbr(d.body, accent) }} />}
         </div>
@@ -302,8 +302,8 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
       return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 'clamp(8px, 1.5vw, 24px)', padding: '0 10%' }}>
           {onDataChange
-            ? <h1 style={{ fontSize: 'clamp(28px, 6vw, 90px)', fontWeight: 900, letterSpacing: -3, textAlign: 'center' }} {...editableProps(onDataChange, 'title')}>{d.title || 'Thank You'}</h1>
-            : <h1 style={{ fontSize: 'clamp(28px, 6vw, 90px)', fontWeight: 900, letterSpacing: -3, textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: hl(d.title || 'Thank You', accent) }} />
+            ? <h1 style={{ fontSize: 'clamp(28px, 6vw, 90px)', fontWeight: 900, letterSpacing: -3, textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || 'Thank You'}</h1>
+            : <h1 style={{ fontSize: 'clamp(28px, 6vw, 90px)', fontWeight: 900, letterSpacing: -3, textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || 'Thank You', accent) }} />
           }
           {d.subtitle && <p style={{ fontSize: 'clamp(10px, 1.5vw, 22px)', fontWeight: 600, letterSpacing: 4, color: kv.secondaryColor, textAlign: 'center' }}>{d.subtitle}</p>}
           <div style={{ width: 60, height: 1, background: `${accent}66` }} />

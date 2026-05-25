@@ -260,6 +260,7 @@ function generateCss(kv: KeyVisual): string {
   const font = kv.fontFamily || "'Pretendard Variable','Pretendard',-apple-system,sans-serif";
 
   return `
+@font-face{font-family:'Pretendard Variable';font-display:swap;src:local('Pretendard Variable')}
 :root{--accent:${accent};--primary:${primary};--secondary:${secondary};--bg:${bg};--font:${font}}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;font-family:var(--font)}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overflow:hidden}
@@ -293,14 +294,14 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overf
 .nav-btns{position:fixed;bottom:24px;right:28px;z-index:10;display:flex;gap:6px}
 .nav-btn{width:40px;height:40px;border-radius:50%;border:1px solid ${primary}33;background:${bg}99;backdrop-filter:blur(8px);color:var(--primary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .nav-btn:hover{border-color:var(--accent);color:var(--accent)}
-.page-counter{position:fixed;bottom:30px;left:28px;z-index:10;font-size:12px;font-weight:700;color:${primary}88;letter-spacing:3px}
+.page-counter{position:fixed;bottom:48px;left:28px;z-index:10;font-size:12px;font-weight:700;color:${primary}88;letter-spacing:3px}
 
 /* Animations */
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes fadeLeft{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
 @keyframes fadeRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-@keyframes scaleIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
 @keyframes bounceIn{0%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.05)}70%{transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
 @keyframes typewriter{from{opacity:1;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
 .anim-item{opacity:0;transform:translateY(24px)}
@@ -418,6 +419,14 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overf
 .sl-outro-sub{font-size:22px;font-weight:600;letter-spacing:4px;color:var(--secondary);text-align:center}
 .sl-outro-divider{width:60px;height:1px;background:${accent}66}
 .sl-outro-contact{font-size:18px;line-height:1.8;font-weight:500;text-align:center;color:var(--secondary)}
+
+/* Brand Chrome */
+.brand-mark{position:fixed;top:28px;left:28px;z-index:10;font-size:16px;font-weight:600;color:${primary}cc;letter-spacing:2px}
+.stage-indicator{position:fixed;bottom:24px;left:28px;z-index:10;font-size:12px;font-weight:700;color:${primary}88;letter-spacing:3px}
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at center,transparent 50%,${bg}cc 100%)}
+
+/* Slide background depth overlay */
+.slide::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.03) 0%,transparent 70%);pointer-events:none;z-index:0}
 `;
 }
 
@@ -520,8 +529,8 @@ function getInitialState(anim){
   switch(anim){
     case 'fadeLeft':return{opacity:'0',transform:'translateX(-40px)'};
     case 'fadeRight':return{opacity:'0',transform:'translateX(40px)'};
-    case 'scaleIn':return{opacity:'0',transform:'scale(.92)'};
-    case 'bounceIn':return{opacity:'0',transform:'scale(.3)'};
+    case 'scaleIn':return{opacity:'0',transform:'scale(.85)'};
+    case 'bounceIn':return{opacity:'0',transform:'scale(.8)'};
     case 'typewriter':return{opacity:'1',transform:'none',clipPath:'inset(0 100% 0 0)'};
     case 'fadeIn':return{opacity:'0',transform:'none'};
     case 'fadeUp':default:return{opacity:'0',transform:'translateY(24px)'};
@@ -550,7 +559,7 @@ function revealItem(el){
     el.style.transition='clip-path .8s steps(20,end)';
   }else if(anim==='bounceIn'){
     el.style.opacity='1';el.style.transform='scale(1)';
-    el.style.transition='opacity .4s ease, transform .6s cubic-bezier(.36,1.56,.64,1)';
+    el.style.transition='opacity .4s ease, transform .6s cubic-bezier(.34,1.56,.64,1)';
   }else if(anim==='scaleIn'){
     el.style.opacity='1';el.style.transform='scale(1)';
     el.style.transition='opacity .5s ease, transform .5s ease';
@@ -584,6 +593,12 @@ function updateCounter(){
   if(pageCounter)pageCounter.textContent=String(cur+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');
 }
 
+var stageEl=document.getElementById('stageInd');
+function updateStage(slideIdx){
+  if(!stageEl)return;
+  var tagEl=slides[slideIdx].querySelector('.sl-tag');
+  stageEl.textContent=tagEl?tagEl.textContent:'';
+}
 function goSlide(i){
   if(i<0||i>=total)return;
   if(i===cur){return}
@@ -603,6 +618,7 @@ function goSlide(i){
   cur=i;subStep=0;
   dots.forEach(function(d,j){d.classList.toggle('active',j===cur)});
   updateCounter();
+  updateStage(i);
 }
 
 function advance(){
@@ -620,6 +636,7 @@ function stepBack(){
 /* initialise first slide: hide all anim-items */
 resetAnimItems(0);
 slides[0].classList.add('active');
+updateStage(0);
 
 document.getElementById('prevBtn').onclick=function(){stepBack()};
 document.getElementById('nextBtn').onclick=function(){advance()};
@@ -660,6 +677,9 @@ ${slidesHtml}
   <button class="nav-btn" id="prevBtn">&#x25C0;</button>
   <button class="nav-btn" id="nextBtn">&#x25B6;</button>
 </div>
+<div class="brand-mark">${esc(project.name)}</div>
+<div class="stage-indicator" id="stageInd"></div>
+<div class="vignette"></div>
 <script>${bgEffectJs}${navJs}</script>
 </body>
 </html>`;
