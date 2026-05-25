@@ -36,6 +36,36 @@ function Input({ value, onChange, placeholder }: { value: string; onChange: (v: 
   return <input type="text" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />;
 }
 
+function BgVideoUpload({ slide }: { slide: Slide }) {
+  const { updateSlide } = useProjectStore();
+  const ref = useRef<HTMLInputElement>(null);
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    updateSlide(slide.id, { backgroundVideo: url });
+    e.target.value = '';
+  };
+
+  return (
+    <Field label="배경 영상 (MP4)">
+      <div className="image-upload-group">
+        <input ref={ref} type="file" accept="video/mp4,video/webm" style={{ display: 'none' }} onChange={handleUpload} />
+        <button className="btn-upload" onClick={() => ref.current?.click()}>
+          {slide.backgroundVideo ? '영상 변경' : '영상 업로드'}
+        </button>
+        {slide.backgroundVideo && (
+          <button className="btn-icon danger" onClick={() => updateSlide(slide.id, { backgroundVideo: undefined })}>&times;</button>
+        )}
+      </div>
+      {slide.backgroundVideo && (
+        <video src={slide.backgroundVideo} muted autoPlay loop style={{ width: '100%', maxHeight: 80, borderRadius: 4, marginTop: 4, objectFit: 'cover' }} />
+      )}
+    </Field>
+  );
+}
+
 export function TemplateEditor({ slide }: { slide: Slide }) {
   const { updateSlide, updateSlideData } = useProjectStore();
   const d = slide.data;
@@ -110,6 +140,7 @@ export function TemplateEditor({ slide }: { slide: Slide }) {
             </select>
           </Field>
         </div>
+        <BgVideoUpload slide={slide} />
       </div>
 
       <div className="te-section">

@@ -52,6 +52,10 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
   const tag = (text?: string) =>
     text ? `<div class="sl-tag anim-item" data-anim="fadeIn">${esc(text)}</div>` : '';
 
+  const bgVideo = slide.backgroundVideo
+    ? `<video class="sl-bg-video" autoplay loop muted playsinline src="${slide.backgroundVideo}"></video>`
+    : '';
+
   let body: string;
 
   switch (slide.template) {
@@ -251,6 +255,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
   }
 
   return `<section class="slide${activeClass}"${transAttr}${bgEffectAttr} style="${bgStyle}">
+  ${bgVideo}
   ${body}
   ${overlaysHtml}
 </section>`;
@@ -325,6 +330,9 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overf
 .fx-shimmer{background:linear-gradient(90deg,transparent 25%,${accent}11 50%,transparent 75%);background-size:200% 100%;animation:shimmer 3s linear infinite}
 .fx-rotate{animation:rotate360 20s linear infinite}
 .fx-breathe{animation:breathe 4s ease-in-out infinite}
+
+/* Background Video */
+.sl-bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
 
 /* Overlays */
 .sl-overlay{pointer-events:none}

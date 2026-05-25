@@ -593,7 +593,16 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
 
   return (
     <div ref={onDataChange ? cRef as React.RefObject<HTMLDivElement> : undefined} style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {templateContent}
+      {slide.backgroundVideo && (
+        <video
+          src={slide.backgroundVideo}
+          autoPlay loop muted playsInline
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, pointerEvents: 'none' }}
+        />
+      )}
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%' }}>
+        {templateContent}
+      </div>
       <OverlayLayer overlays={overlays} onDataChange={onDataChange} containerRef={cRef} />
     </div>
   );

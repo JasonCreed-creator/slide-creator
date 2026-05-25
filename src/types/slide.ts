@@ -135,6 +135,7 @@ export interface Slide {
   duration: number;
   backgroundColor?: string;
   backgroundEffect?: BackgroundEffectType;
+  backgroundVideo?: string;
   entryAnimation: EntryAnimation;
 }
 
