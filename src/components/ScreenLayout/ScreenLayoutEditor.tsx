@@ -1,5 +1,6 @@
 import { useProjectStore } from '@/stores/projectStore';
 import { LAYOUT_PRESETS } from '@/presets/defaults';
+import { MiniPreview } from '@/components/Preview';
 import type { ScreenLayout } from '@/types';
 
 export function ScreenLayoutEditor() {
@@ -45,6 +46,8 @@ export function ScreenLayoutEditor() {
           </button>
         ))}
       </div>
+
+      <MiniPreview />
 
       <div className="panel-actions">
         <button className="btn-secondary" onClick={() => setEditorStep('screen')}>

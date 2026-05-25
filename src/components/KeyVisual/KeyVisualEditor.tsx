@@ -1,5 +1,6 @@
 import { useProjectStore } from '@/stores/projectStore';
 import { KEY_VISUAL_PRESETS } from '@/presets/defaults';
+import { MiniPreview } from '@/components/Preview';
 import type { KeyVisual } from '@/types';
 
 export function KeyVisualEditor() {
@@ -42,6 +43,8 @@ export function KeyVisualEditor() {
           </button>
         ))}
       </div>
+
+      <MiniPreview />
 
       <div className="panel-actions">
         <button className="btn-secondary" onClick={() => setEditorStep('layout')}>

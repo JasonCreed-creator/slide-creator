@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
 import { SCREEN_PRESETS } from '@/presets/defaults';
 import { createCustomScreen } from '@/utils/screen';
+import { MiniPreview } from '@/components/Preview';
 import type { ScreenSpec } from '@/types';
 
 export function ScreenConfig() {
@@ -92,6 +93,8 @@ export function ScreenConfig() {
           </button>
         </div>
       )}
+
+      <MiniPreview />
 
       <div className="panel-actions">
         <button className="btn-primary" onClick={() => setEditorStep('layout')}>
