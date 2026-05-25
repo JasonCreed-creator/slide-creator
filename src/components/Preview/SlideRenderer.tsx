@@ -311,6 +311,265 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
         </div>
       );
 
+    case 'two-column':
+      return (
+        <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Tag text={d.tag} accent={accent} />
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 48px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 32px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 48px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 32px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          <div style={{ display: 'flex', gap: 'clamp(12px, 3vw, 40px)', flex: 1, alignItems: 'stretch' }}>
+            <div style={{ flex: 1, background: `${accent}0a`, border: `1px solid ${accent}22`, borderRadius: 12, padding: 'clamp(12px, 2vw, 28px)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+              {onDataChange
+                ? <h3 style={{ fontSize: 'clamp(12px, 2vw, 28px)', fontWeight: 700, color: accent, marginBottom: 'clamp(6px, 1vw, 14px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'leftTitle')}>{d.leftTitle || ''}</h3>
+                : <h3 style={{ fontSize: 'clamp(12px, 2vw, 28px)', fontWeight: 700, color: accent, marginBottom: 'clamp(6px, 1vw, 14px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.leftTitle || '', accent) }} />
+              }
+              {onDataChange
+                ? <p style={{ fontSize: 'clamp(9px, 1.3vw, 18px)', lineHeight: 1.7, fontWeight: 500, whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'leftBody', true)}>{d.leftBody || ''}</p>
+                : <p style={{ fontSize: 'clamp(9px, 1.3vw, 18px)', lineHeight: 1.7, fontWeight: 500 }} dangerouslySetInnerHTML={{ __html: nlbr(d.leftBody || '', accent) }} />
+              }
+            </div>
+            <div style={{ flex: 1, background: `${accent}0a`, border: `1px solid ${accent}22`, borderRadius: 12, padding: 'clamp(12px, 2vw, 28px)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+              {onDataChange
+                ? <h3 style={{ fontSize: 'clamp(12px, 2vw, 28px)', fontWeight: 700, color: accent, marginBottom: 'clamp(6px, 1vw, 14px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'rightTitle')}>{d.rightTitle || ''}</h3>
+                : <h3 style={{ fontSize: 'clamp(12px, 2vw, 28px)', fontWeight: 700, color: accent, marginBottom: 'clamp(6px, 1vw, 14px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.rightTitle || '', accent) }} />
+              }
+              {onDataChange
+                ? <p style={{ fontSize: 'clamp(9px, 1.3vw, 18px)', lineHeight: 1.7, fontWeight: 500, whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'rightBody', true)}>{d.rightBody || ''}</p>
+                : <p style={{ fontSize: 'clamp(9px, 1.3vw, 18px)', lineHeight: 1.7, fontWeight: 500 }} dangerouslySetInnerHTML={{ __html: nlbr(d.rightBody || '', accent) }} />
+              }
+            </div>
+          </div>
+        </div>
+      );
+
+    case 'comparison': {
+      const isLeftWin = d.winner === 'left';
+      const isRightWin = d.winner === 'right';
+      const winGlow = (active: boolean): React.CSSProperties => active
+        ? { boxShadow: `0 0 30px ${accent}44, 0 0 60px ${accent}22`, border: `2px solid ${accent}88`, animation: 'comparison-pulse 2s ease-in-out infinite' }
+        : {};
+      return (
+        <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Tag text={d.tag} accent={accent} />
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 28px)', textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 28px)', textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          <div style={{ display: 'flex', gap: 'clamp(12px, 2.5vw, 32px)', flex: 1, alignItems: 'stretch' }}>
+            <div style={{
+              flex: 1, background: `${accent}0a`, border: `1px solid ${accent}22`, borderRadius: 14,
+              padding: 'clamp(12px, 2vw, 28px)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+              display: 'flex', flexDirection: 'column', position: 'relative', transition: 'box-shadow 0.3s ease',
+              ...winGlow(isLeftWin),
+            }}>
+              {isLeftWin && <div style={{ position: 'absolute', top: 'clamp(6px, 1vw, 12px)', right: 'clamp(6px, 1vw, 12px)', fontSize: 'clamp(7px, 0.8vw, 11px)', fontWeight: 700, color: accent, background: `${accent}1a`, padding: '3px 10px', borderRadius: 20, letterSpacing: 1 }}>WIN</div>}
+              <div style={{ fontSize: 'clamp(10px, 1.6vw, 22px)', fontWeight: 700, color: accent, marginBottom: 'clamp(6px, 1vw, 12px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'leftLabel')}>{d.leftLabel || 'Option A'}</div>
+              {onDataChange
+                ? <p style={{ fontSize: 'clamp(8px, 1.2vw, 16px)', lineHeight: 1.7, fontWeight: 500, flex: 1, whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'leftContent', true)}>{d.leftContent || ''}</p>
+                : <p style={{ fontSize: 'clamp(8px, 1.2vw, 16px)', lineHeight: 1.7, fontWeight: 500, flex: 1 }} dangerouslySetInnerHTML={{ __html: nlbr(d.leftContent || '', accent) }} />
+              }
+              {d.leftMetricValue && (
+                <div style={{ marginTop: 'clamp(8px, 1vw, 16px)', paddingTop: 'clamp(8px, 1vw, 16px)', borderTop: `1px solid ${accent}22`, textAlign: 'center' }}>
+                  <div style={{ fontSize: 'clamp(16px, 3vw, 42px)', fontWeight: 800, color: accent, textShadow: `0 0 40px ${accent}44, 0 2px 12px rgba(0,0,0,0.3)` }}>{d.leftMetricValue}</div>
+                  {d.leftMetricLabel && <div style={{ fontSize: 'clamp(7px, 0.8vw, 12px)', fontWeight: 600, color: kv.secondaryColor, letterSpacing: 2, marginTop: 4 }}>{d.leftMetricLabel}</div>}
+                </div>
+              )}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', fontSize: 'clamp(12px, 1.5vw, 22px)', fontWeight: 700, color: kv.secondaryColor }}>VS</div>
+            <div style={{
+              flex: 1, background: `${accent}0a`, border: `1px solid ${accent}22`, borderRadius: 14,
+              padding: 'clamp(12px, 2vw, 28px)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+              display: 'flex', flexDirection: 'column', position: 'relative', transition: 'box-shadow 0.3s ease',
+              ...winGlow(isRightWin),
+            }}>
+              {isRightWin && <div style={{ position: 'absolute', top: 'clamp(6px, 1vw, 12px)', right: 'clamp(6px, 1vw, 12px)', fontSize: 'clamp(7px, 0.8vw, 11px)', fontWeight: 700, color: accent, background: `${accent}1a`, padding: '3px 10px', borderRadius: 20, letterSpacing: 1 }}>WIN</div>}
+              <div style={{ fontSize: 'clamp(10px, 1.6vw, 22px)', fontWeight: 700, color: accent, marginBottom: 'clamp(6px, 1vw, 12px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'rightLabel')}>{d.rightLabel || 'Option B'}</div>
+              {onDataChange
+                ? <p style={{ fontSize: 'clamp(8px, 1.2vw, 16px)', lineHeight: 1.7, fontWeight: 500, flex: 1, whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'rightContent', true)}>{d.rightContent || ''}</p>
+                : <p style={{ fontSize: 'clamp(8px, 1.2vw, 16px)', lineHeight: 1.7, fontWeight: 500, flex: 1 }} dangerouslySetInnerHTML={{ __html: nlbr(d.rightContent || '', accent) }} />
+              }
+              {d.rightMetricValue && (
+                <div style={{ marginTop: 'clamp(8px, 1vw, 16px)', paddingTop: 'clamp(8px, 1vw, 16px)', borderTop: `1px solid ${accent}22`, textAlign: 'center' }}>
+                  <div style={{ fontSize: 'clamp(16px, 3vw, 42px)', fontWeight: 800, color: accent, textShadow: `0 0 40px ${accent}44, 0 2px 12px rgba(0,0,0,0.3)` }}>{d.rightMetricValue}</div>
+                  {d.rightMetricLabel && <div style={{ fontSize: 'clamp(7px, 0.8vw, 12px)', fontWeight: 600, color: kv.secondaryColor, letterSpacing: 2, marginTop: 4 }}>{d.rightMetricLabel}</div>}
+                </div>
+              )}
+            </div>
+          </div>
+          <style>{`@keyframes comparison-pulse { 0%, 100% { box-shadow: 0 0 30px ${accent}44, 0 0 60px ${accent}22; } 50% { box-shadow: 0 0 40px ${accent}66, 0 0 80px ${accent}33; } }`}</style>
+        </div>
+      );
+    }
+
+    case 'image-text':
+      return (
+        <div style={{ display: 'flex', flexDirection: d.imagePosition === 'right' ? 'row-reverse' : 'row', height: '100%' }}>
+          <div style={{ flex: '0 0 50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: `${accent}08` }}>
+            {d.imageUrl ? (
+              <img src={d.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} draggable={false} />
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: kv.secondaryColor }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>
+                <div style={{ fontSize: 'clamp(8px, 1vw, 13px)', fontWeight: 600, letterSpacing: 2 }}>IMAGE</div>
+              </div>
+            )}
+          </div>
+          <div style={{ flex: '0 0 50%', padding: '7%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Tag text={d.tag} accent={accent} />
+            {onDataChange
+              ? <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 48px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+              : <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 48px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+            }
+            {onDataChange
+              ? <p style={{ fontSize: 'clamp(9px, 1.3vw, 18px)', lineHeight: 1.7, fontWeight: 500, marginTop: 'clamp(10px, 1.5vw, 24px)', whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'body', true)}>{d.body || ''}</p>
+              : <p style={{ fontSize: 'clamp(9px, 1.3vw, 18px)', lineHeight: 1.7, fontWeight: 500, marginTop: 'clamp(10px, 1.5vw, 24px)' }} dangerouslySetInnerHTML={{ __html: nlbr(d.body || '', accent) }} />
+            }
+          </div>
+        </div>
+      );
+
+    case 'cards':
+      return (
+        <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Tag text={d.tag} accent={accent} />
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 28px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 28px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          <div style={{ display: 'flex', gap: 'clamp(8px, 1.5vw, 20px)', flex: 1, alignItems: 'stretch' }}>
+            {(d.cards || []).map((card, i) => (
+              <div key={i} style={{
+                flex: 1, background: card.highlight ? `${accent}14` : `${accent}08`,
+                border: `1px solid ${card.highlight ? `${accent}44` : `${accent}1a`}`,
+                borderRadius: 14, padding: 'clamp(12px, 2vw, 28px)',
+                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                display: 'flex', flexDirection: 'column',
+                boxShadow: card.highlight ? `0 0 30px ${accent}22, 0 4px 20px rgba(0,0,0,0.15)` : '0 4px 20px rgba(0,0,0,0.08)',
+                transition: 'box-shadow 0.3s ease',
+              }}>
+                <div style={{ fontSize: 'clamp(10px, 1.5vw, 22px)', fontWeight: 700, color: accent, marginBottom: 'clamp(6px, 1vw, 14px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>{card.title}</div>
+                <p style={{ fontSize: 'clamp(8px, 1.1vw, 15px)', lineHeight: 1.7, fontWeight: 500 }} dangerouslySetInnerHTML={{ __html: nlbr(card.body || '', accent) }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+    case 'timeline':
+      return (
+        <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Tag text={d.tag} accent={accent} />
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 28px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 28px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          <div style={{ display: 'flex', gap: 'clamp(4px, 0.8vw, 12px)', flex: 1, alignItems: 'stretch', position: 'relative' }}>
+            {(d.steps || []).map((step, i) => {
+              const total = (d.steps || []).length;
+              return (
+                <div key={i} style={{
+                  flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  position: 'relative',
+                }}>
+                  {/* connector line */}
+                  {i < total - 1 && (
+                    <div style={{
+                      position: 'absolute', top: 'clamp(10px, 1.5vw, 22px)',
+                      left: '50%', right: '-50%', height: 2,
+                      background: `linear-gradient(to right, ${accent}66, ${accent}22)`, zIndex: 0,
+                    }} />
+                  )}
+                  {/* stage dot */}
+                  <div style={{
+                    width: 'clamp(20px, 3vw, 44px)', height: 'clamp(20px, 3vw, 44px)',
+                    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 'clamp(8px, 1vw, 14px)', fontWeight: 800, zIndex: 1,
+                    background: step.highlight ? accent : `${accent}22`,
+                    color: step.highlight ? '#fff' : accent,
+                    boxShadow: step.highlight ? `0 0 20px ${accent}44, 0 0 40px ${accent}22` : 'none',
+                  }}>{step.stage}</div>
+                  {/* content card */}
+                  <div style={{
+                    marginTop: 'clamp(6px, 1vw, 14px)', textAlign: 'center', flex: 1,
+                    background: step.highlight ? `${accent}14` : `${accent}08`,
+                    border: `1px solid ${step.highlight ? `${accent}44` : `${accent}1a`}`,
+                    borderRadius: 10, padding: 'clamp(6px, 1vw, 14px)',
+                    backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                    boxShadow: step.highlight ? `0 0 24px ${accent}1a` : 'none',
+                  }}>
+                    <div style={{ fontSize: 'clamp(8px, 1.2vw, 16px)', fontWeight: 700, color: accent, marginBottom: 4, textShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>{step.title}</div>
+                    <div style={{ fontSize: 'clamp(7px, 0.9vw, 12px)', lineHeight: 1.5, fontWeight: 500 }}>{step.detail}</div>
+                    {step.metric && <div style={{ fontSize: 'clamp(10px, 1.5vw, 20px)', fontWeight: 800, color: accent, marginTop: 6, textShadow: `0 0 20px ${accent}33` }}>{step.metric}</div>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+
+    case 'stats':
+      return (
+        <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Tag text={d.tag} accent={accent} />
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 28px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 28px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min((d.metrics || []).length, 3)}, 1fr)`, gap: 'clamp(8px, 1.5vw, 20px)', flex: 1, alignContent: 'center' }}>
+            {(d.metrics || []).map((m, i) => (
+              <div key={i} style={{
+                background: `${accent}0a`, border: `1px solid ${accent}22`, borderRadius: 14,
+                padding: 'clamp(14px, 2.5vw, 36px)', textAlign: 'center',
+                backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              }}>
+                <div style={{ fontSize: 'clamp(20px, 4vw, 56px)', fontWeight: 800, letterSpacing: -2, color: accent, lineHeight: 1, textShadow: `0 0 60px ${accent}66, 0 4px 20px ${accent}40, 0 2px 12px rgba(0,0,0,0.3)` }}>{m.value}</div>
+                <div style={{ fontSize: 'clamp(7px, 0.9vw, 13px)', fontWeight: 700, letterSpacing: 3, color: kv.secondaryColor, marginTop: 'clamp(6px, 1vw, 14px)' }}>{m.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+    case 'video':
+      return (
+        <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Tag text={d.tag} accent={accent} />
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 24px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(16px, 3vw, 44px)', fontWeight: 800, letterSpacing: -2, marginBottom: 'clamp(12px, 2vw, 24px)', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          <div style={{
+            flex: 1, borderRadius: 14, overflow: 'hidden',
+            background: `${accent}08`, border: `1px solid ${accent}22`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {d.videoUrl ? (
+              <iframe
+                src={d.videoUrl}
+                style={{ width: '100%', height: '100%', border: 'none' }}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                title="video"
+              />
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, color: kv.secondaryColor }}>
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                <div style={{ fontSize: 'clamp(8px, 1vw, 13px)', fontWeight: 600, letterSpacing: 2 }}>VIDEO</div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+
+    case 'blank':
+      return (
+        <div style={{ position: 'relative', width: '100%', height: '100%' }} />
+      );
+
     default:
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', opacity: .5 }}>
