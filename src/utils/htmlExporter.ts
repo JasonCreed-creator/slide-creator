@@ -18,13 +18,14 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
   const bg = slide.backgroundColor || '';
   const bgStyle = bg ? `background:${bg};` : '';
   const activeClass = index === 0 ? ' active' : '';
+  const transAttr = ` data-transition="${slide.transition || 'fade'}"`;
 
   const tag = (text?: string) =>
     text ? `<div class="sl-tag anim-item">${esc(text)}</div>` : '';
 
   switch (slide.template) {
     case 'title':
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-center">
     ${tag(d.tag)}
     <h1 class="sl-hero-title anim-item">${highlight(d.title || '', accent)}</h1>
@@ -33,7 +34,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
 </section>`;
 
     case 'section-cover':
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-cover">
     <div class="sl-cover-label anim-item">${esc(d.subtitle || '')}</div>
     <div class="sl-cover-num anim-item">${esc(d.number || '')}</div>
@@ -43,7 +44,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
 </section>`;
 
     case 'content':
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-title-area">
     ${tag(d.tag)}
     <h1 class="sl-heading anim-item">${highlight(d.title || '', accent)}</h1>
@@ -54,7 +55,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
 </section>`;
 
     case 'two-column':
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-title-area">
     ${tag(d.tag)}
     <h1 class="sl-heading anim-item">${highlight(d.title || '', accent)}</h1>
@@ -72,7 +73,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
 </section>`;
 
     case 'comparison':
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-title-area">
     ${tag(d.tag)}
     <h1 class="sl-heading anim-item">${highlight(d.title || '', accent)}</h1>
@@ -98,7 +99,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
 </section>`;
 
     case 'metrics':
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-title-area">
     ${tag(d.tag)}
     <h1 class="sl-heading anim-item">${highlight(d.title || '', accent)}</h1>
@@ -113,7 +114,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
 </section>`;
 
     case 'quote':
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-quote-wrap">
     ${tag(d.tag)}
     <blockquote class="sl-quote anim-item">${highlight(d.quote || '', accent)}</blockquote>
@@ -131,7 +132,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
       <h3>${highlight(d.title || '', accent)}</h3>
       <p>${nl2br(d.body || '', accent)}</p>
     </div>`;
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-img-layout${imgFirst ? '' : ' reverse'}">
     ${imgFirst ? imgHtml + textHtml : textHtml + imgHtml}
   </div>
@@ -139,7 +140,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
     }
 
     case 'cards':
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-title-area">
     ${tag(d.tag)}
     <h1 class="sl-heading anim-item">${highlight(d.title || '', accent)}</h1>
@@ -154,7 +155,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
 </section>`;
 
     case 'blank':
-      return `<section class="slide${activeClass}" style="${bgStyle}">
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-center anim-item">
     <h2 style="opacity:.5">${esc(slide.label)}</h2>
   </div>
@@ -175,8 +176,24 @@ function generateCss(kv: KeyVisual): string {
 html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overflow:hidden}
 #starCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 .deck{position:relative;z-index:2;width:100vw;height:100vh;overflow:hidden}
-.slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .5s ease;display:flex;flex-direction:column}
-.slide.active{opacity:1;pointer-events:auto}
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;display:flex;flex-direction:column;transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1),filter .6s cubic-bezier(.22,1,.36,1)}
+.slide.active{opacity:1;pointer-events:auto;transform:none;filter:none}
+.slide.exit-fade{opacity:0}
+.slide.exit-dissolve{opacity:0;filter:blur(8px)}
+.slide.exit-slide-left{transform:translateX(-100%)}
+.slide.exit-slide-right{transform:translateX(100%)}
+.slide.exit-slide-up{transform:translateY(-100%)}
+.slide.exit-slide-down{transform:translateY(100%)}
+.slide.exit-zoom-in{opacity:0;transform:scale(1.2)}
+.slide.exit-zoom-out{opacity:0;transform:scale(0.8)}
+.slide.enter-fade{opacity:0}
+.slide.enter-dissolve{opacity:0;filter:blur(8px)}
+.slide.enter-slide-left{transform:translateX(100%)}
+.slide.enter-slide-right{transform:translateX(-100%)}
+.slide.enter-slide-up{transform:translateY(100%)}
+.slide.enter-slide-down{transform:translateY(-100%)}
+.slide.enter-zoom-in{opacity:0;transform:scale(0.8)}
+.slide.enter-zoom-out{opacity:0;transform:scale(1.2)}
 
 /* Navigation */
 #dotNav{position:fixed;top:28px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:3px;align-items:center;background:rgba(0,0,0,.5);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 6px}
@@ -324,10 +341,19 @@ function updateCounter(){
 function goSlide(i){
   if(i<0||i>=total)return;
   if(i===cur){subStep=0;resetAnimItems(cur);return}
-  slides[cur].classList.remove('active');
+  var oldSlide=slides[cur];
+  var newSlide=slides[i];
+  var trans=newSlide.dataset.transition||'fade';
+  oldSlide.classList.add('exit-'+trans);
+  newSlide.classList.add('enter-'+trans);
+  resetAnimItems(i);
+  void newSlide.offsetWidth;
+  newSlide.classList.add('active');
+  newSlide.classList.remove('enter-'+trans);
+  setTimeout(function(){
+    oldSlide.classList.remove('active','exit-'+trans);
+  },650);
   cur=i;subStep=0;
-  resetAnimItems(cur);
-  slides[cur].classList.add('active');
   dots.forEach(function(d,j){d.classList.toggle('active',j===cur)});
   updateCounter();
 }

@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
 import { TemplateEditor } from './TemplateEditor';
 import { SlideRenderer } from '@/components/Preview/SlideRenderer';
 import { generateSlides, getStoredApiKey, setStoredApiKey } from '@/utils/aiGenerator';
-import type { SlideTemplate } from '@/types';
+import type { SlideTemplate, TemplateData } from '@/types';
 import { TEMPLATE_LABELS } from '@/types';
 
 const TEMPLATE_OPTIONS: { value: SlideTemplate; icon: string }[] = [
@@ -102,12 +102,20 @@ export function ScreenPlayEditor() {
   const {
     project, addSlideFromTemplate, removeSlide, reorderSlides,
     duplicateSlide, activeSlideId, setActiveSlide, setEditorStep,
+    updateSlideData,
   } = useProjectStore();
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showAi, setShowAi] = useState(false);
 
   const activeSlide = project.slides.find((s) => s.id === activeSlideId);
   const kv = project.keyVisual;
+
+  const handlePreviewDataChange = useCallback(
+    (patch: Partial<TemplateData>) => {
+      if (activeSlideId) updateSlideData(activeSlideId, patch);
+    },
+    [activeSlideId, updateSlideData],
+  );
 
   const handleAdd = (template: SlideTemplate) => {
     addSlideFromTemplate(template);
@@ -192,7 +200,7 @@ export function ScreenPlayEditor() {
                   fontFamily: kv.fontFamily,
                 }}
               >
-                <SlideRenderer slide={activeSlide} kv={kv} />
+                <SlideRenderer slide={activeSlide} kv={kv} onDataChange={handlePreviewDataChange} />
               </div>
             </div>
           </div>

@@ -1,13 +1,44 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
 import { SlideRenderer } from './SlideRenderer';
+import type { TransitionType } from '@/types';
+
+function getTransitionStyles(_transition: TransitionType) {
+  const enterFrom: Record<TransitionType, string> = {
+    none: '',
+    fade: 'opacity:0;',
+    dissolve: 'opacity:0; filter:blur(8px);',
+    'slide-left': 'transform:translateX(100%);',
+    'slide-right': 'transform:translateX(-100%);',
+    'slide-up': 'transform:translateY(100%);',
+    'slide-down': 'transform:translateY(-100%);',
+    'zoom-in': 'opacity:0; transform:scale(0.8);',
+    'zoom-out': 'opacity:0; transform:scale(1.2);',
+  };
+
+  const exitTo: Record<TransitionType, string> = {
+    none: '',
+    fade: 'opacity:0;',
+    dissolve: 'opacity:0; filter:blur(8px);',
+    'slide-left': 'transform:translateX(-100%);',
+    'slide-right': 'transform:translateX(100%);',
+    'slide-up': 'transform:translateY(-100%);',
+    'slide-down': 'transform:translateY(100%);',
+    'zoom-in': 'opacity:0; transform:scale(1.2);',
+    'zoom-out': 'opacity:0; transform:scale(0.8);',
+  };
+
+  return { enterFrom, exitTo };
+}
 
 export function SlidePreview() {
   const { project, setEditorStep } = useProjectStore();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [prevIndex, setPrevIndex] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [transitioning, setTransitioning] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const slides = project.slides;
@@ -16,10 +47,16 @@ export function SlidePreview() {
   const currentSlide = hasSlides ? slides[currentIndex] : null;
 
   const go = useCallback((i: number) => {
-    if (i < 0 || i >= slides.length) return;
+    if (i < 0 || i >= slides.length || i === currentIndex || transitioning) return;
+    setPrevIndex(currentIndex);
     setCurrentIndex(i);
     setElapsed(0);
-  }, [slides.length]);
+    setTransitioning(true);
+    setTimeout(() => {
+      setPrevIndex(null);
+      setTransitioning(false);
+    }, 650);
+  }, [slides.length, currentIndex, transitioning]);
 
   const goNext = useCallback(() => go(currentIndex < slides.length - 1 ? currentIndex + 1 : 0), [currentIndex, slides.length, go]);
   const goPrev = useCallback(() => go(currentIndex > 0 ? currentIndex - 1 : slides.length - 1), [currentIndex, slides.length, go]);
@@ -60,6 +97,43 @@ export function SlidePreview() {
     document.fullscreenElement ? document.exitFullscreen() : containerRef.current.requestFullscreen();
   };
 
+  const transition = currentSlide?.transition || 'fade';
+  const { enterFrom, exitTo } = getTransitionStyles(transition);
+
+  const currentStyle: React.CSSProperties = {
+    position: 'absolute', inset: 0,
+    transition: 'opacity 0.6s cubic-bezier(.22,1,.36,1), transform 0.6s cubic-bezier(.22,1,.36,1), filter 0.6s cubic-bezier(.22,1,.36,1)',
+    opacity: 1, transform: 'none', filter: 'none',
+  };
+
+  const enterStyle: React.CSSProperties = (() => {
+    const s: React.CSSProperties = { ...currentStyle };
+    const from = enterFrom[transition];
+    if (from.includes('opacity:0')) s.opacity = 0;
+    if (from.includes('translateX(100%)')) s.transform = 'translateX(100%)';
+    if (from.includes('translateX(-100%)')) s.transform = 'translateX(-100%)';
+    if (from.includes('translateY(100%)')) s.transform = 'translateY(100%)';
+    if (from.includes('translateY(-100%)')) s.transform = 'translateY(-100%)';
+    if (from.includes('scale(0.8)')) { s.opacity = 0; s.transform = 'scale(0.8)'; }
+    if (from.includes('scale(1.2)')) { s.opacity = 0; s.transform = 'scale(1.2)'; }
+    if (from.includes('blur')) s.filter = 'blur(8px)';
+    return s;
+  })();
+
+  const exitStyle: React.CSSProperties = (() => {
+    const s: React.CSSProperties = { ...currentStyle };
+    const to = exitTo[transition];
+    if (to.includes('opacity:0')) s.opacity = 0;
+    if (to.includes('translateX(-100%)')) s.transform = 'translateX(-100%)';
+    if (to.includes('translateX(100%)')) s.transform = 'translateX(100%)';
+    if (to.includes('translateY(-100%)')) s.transform = 'translateY(-100%)';
+    if (to.includes('translateY(100%)')) s.transform = 'translateY(100%)';
+    if (to.includes('scale(1.2)')) { s.opacity = 0; s.transform = 'scale(1.2)'; }
+    if (to.includes('scale(0.8)')) { s.opacity = 0; s.transform = 'scale(0.8)'; }
+    if (to.includes('blur')) s.filter = 'blur(8px)';
+    return s;
+  })();
+
   return (
     <div ref={containerRef} className={`preview-container ${isFullscreen ? 'preview-fullscreen' : ''}`}>
       {!isFullscreen && (
@@ -89,10 +163,41 @@ export function SlidePreview() {
 
       <div className="preview-screen" style={{
         aspectRatio: `${project.screen.widthPx} / ${project.screen.heightPx}`,
-        background: currentSlide?.backgroundColor || kv.gradientCss || kv.backgroundColor,
+        background: kv.gradientCss || kv.backgroundColor,
         color: kv.primaryColor, fontFamily: kv.fontFamily,
+        overflow: 'hidden',
       }}>
-        {hasSlides && currentSlide && <SlideRenderer slide={currentSlide} kv={kv} />}
+        {/* Exiting slide */}
+        {prevIndex !== null && slides[prevIndex] && (
+          <div style={{
+            ...exitStyle,
+            background: slides[prevIndex].backgroundColor || 'transparent',
+          }}>
+            <SlideRenderer slide={slides[prevIndex]} kv={kv} />
+          </div>
+        )}
+
+        {/* Current slide */}
+        {hasSlides && currentSlide && (
+          <div style={{
+            ...(prevIndex !== null ? enterStyle : currentStyle),
+            ...(prevIndex === null ? {} : {}),
+            background: currentSlide.backgroundColor || 'transparent',
+          }}
+          ref={(el) => {
+            if (el && prevIndex !== null) {
+              requestAnimationFrame(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+                el.style.filter = 'none';
+              });
+            }
+          }}
+          >
+            <SlideRenderer slide={currentSlide} kv={kv} />
+          </div>
+        )}
+
         {!hasSlides && <div className="preview-empty-overlay"><p className="preview-empty-text">슬라이드를 추가하면 여기에 표시됩니다</p></div>}
       </div>
 
