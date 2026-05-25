@@ -10,4 +10,14 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        format: 'iife',
+        inlineDynamicImports: true,
+        entryFileNames: 'assets/app.js',
+        assetFileNames: 'assets/[name][extname]',
+      },
+    },
+  },
 })
