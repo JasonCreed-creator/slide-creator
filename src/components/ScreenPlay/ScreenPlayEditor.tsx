@@ -16,6 +16,11 @@ const TEMPLATE_OPTIONS: { value: SlideTemplate; icon: string }[] = [
   { value: 'quote', icon: '"' },
   { value: 'image-text', icon: 'IMG' },
   { value: 'cards', icon: '::' },
+  { value: 'timeline', icon: '→' },
+  { value: 'big-number', icon: '##' },
+  { value: 'stats', icon: '▤' },
+  { value: 'video', icon: '▶' },
+  { value: 'outro', icon: '✦' },
   { value: 'blank', icon: '+' },
 ];
 

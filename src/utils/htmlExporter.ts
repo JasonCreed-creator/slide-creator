@@ -154,6 +154,77 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
   </div>
 </section>`;
 
+    case 'timeline':
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
+  <div class="sl-title-area">
+    ${tag(d.tag)}
+    <h1 class="sl-heading anim-item">${highlight(d.title || '', accent)}</h1>
+  </div>
+  <div class="sl-timeline">
+    ${(d.steps || []).map((step) => `
+    <div class="sl-timeline-step${step.highlight ? ' featured' : ''} anim-item">
+      <div class="sl-timeline-stage">${esc(step.stage)}</div>
+      <h4>${highlight(step.title, accent)}</h4>
+      <p>${nl2br(step.detail, accent)}</p>
+      ${step.metric ? `<div class="sl-timeline-metric">${esc(step.metric)}</div>` : ''}
+    </div>`).join('')}
+  </div>
+</section>`;
+
+    case 'big-number':
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
+  <div class="sl-big-number">
+    ${d.subtitle ? `<div class="sl-big-number-label anim-item">${esc(d.subtitle)}</div>` : ''}
+    <div class="sl-big-number-value anim-item">${esc(d.number || '')}</div>
+    <div class="sl-big-number-divider anim-item"></div>
+    <div class="sl-big-number-title anim-item">${highlight(d.title || '', accent)}</div>
+    ${d.body ? `<p class="sl-big-number-body anim-item">${nl2br(d.body, accent)}</p>` : ''}
+  </div>
+</section>`;
+
+    case 'stats':
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
+  <div class="sl-title-area">
+    ${tag(d.tag)}
+    <h1 class="sl-heading anim-item">${highlight(d.title || '', accent)}</h1>
+  </div>
+  <div class="sl-stats">
+    <div class="sl-stats-metrics">
+      ${(d.metrics || []).map((m) => `
+      <div class="sl-metric anim-item">
+        <div class="sl-metric-value">${esc(m.value)}</div>
+        <div class="sl-metric-label">${esc(m.label)}</div>
+      </div>`).join('')}
+    </div>
+    ${d.body ? `<div class="sl-stats-body anim-item"><p>${nl2br(d.body, accent)}</p></div>` : ''}
+  </div>
+</section>`;
+
+    case 'video':
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
+  <div class="sl-title-area">
+    ${tag(d.tag)}
+    <h1 class="sl-heading anim-item">${highlight(d.title || '', accent)}</h1>
+  </div>
+  <div class="sl-video">
+    ${d.videoUrl
+      ? `<video class="sl-video-el anim-item" src="${esc(d.videoUrl)}" controls></video>`
+      : `<div class="sl-video-placeholder anim-item">&#x25B6;</div>`}
+    ${d.body ? `<p class="sl-video-caption anim-item">${nl2br(d.body, accent)}</p>` : ''}
+  </div>
+</section>`;
+
+    case 'outro':
+      return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
+  <div class="sl-outro">
+    ${d.logoUrl ? `<img class="sl-outro-logo anim-item" src="${esc(d.logoUrl)}" alt="">` : ''}
+    <h1 class="sl-outro-title anim-item">${highlight(d.title || 'Thank You', accent)}</h1>
+    ${d.subtitle ? `<p class="sl-outro-sub anim-item">${esc(d.subtitle)}</p>` : ''}
+    <div class="sl-outro-divider anim-item"></div>
+    ${d.contactInfo ? `<p class="sl-outro-contact anim-item">${nl2br(d.contactInfo, accent)}</p>` : ''}
+  </div>
+</section>`;
+
     case 'blank':
       return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
   <div class="sl-center anim-item">
@@ -283,6 +354,45 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overf
 .sl-card.featured::before{opacity:1}
 .sl-card h4{font-size:24px;font-weight:800;line-height:1.25;margin-bottom:12px;letter-spacing:-.5px}
 .sl-card p{font-size:17px;line-height:1.6;color:var(--primary);font-weight:500}
+
+/* Timeline */
+.sl-timeline{position:absolute;top:24%;left:7%;right:7%;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
+.sl-timeline-step{padding:30px 24px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.02);border-radius:4px;position:relative;min-height:200px;display:flex;flex-direction:column}
+.sl-timeline-step::before{content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:var(--accent);opacity:.3}
+.sl-timeline-step.featured{border-color:var(--accent);background:${accent}0f;box-shadow:0 0 30px ${accent}15}
+.sl-timeline-step.featured::before{opacity:1}
+.sl-timeline-stage{font-size:11px;font-weight:700;letter-spacing:3px;color:var(--accent);margin-bottom:8px}
+.sl-timeline-step h4{font-size:24px;font-weight:800;line-height:1.25;margin-bottom:12px;letter-spacing:-.5px}
+.sl-timeline-step p{font-size:17px;line-height:1.6;color:var(--primary);font-weight:500;flex:1}
+.sl-timeline-metric{font-size:20px;font-weight:800;color:var(--accent);margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.15)}
+
+/* Big Number */
+.sl-big-number{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:0 10% 6%}
+.sl-big-number-label{font-size:13px;font-weight:700;letter-spacing:6px;color:${secondary}}
+.sl-big-number-value{font-size:180px;font-weight:900;letter-spacing:-6px;line-height:.9;color:var(--accent);text-shadow:0 0 80px ${accent}66}
+.sl-big-number-divider{width:1px;height:30px;background:linear-gradient(to bottom,var(--accent),transparent)}
+.sl-big-number-title{font-size:60px;font-weight:800;letter-spacing:-2px;text-align:center}
+.sl-big-number-body{font-size:22px;line-height:1.7;font-weight:500;text-align:center;max-width:70%}
+
+/* Stats */
+.sl-stats{position:absolute;top:24%;left:7%;right:7%;bottom:12%;display:flex;flex-direction:column}
+.sl-stats-metrics{display:flex;justify-content:center;gap:60px;margin-top:16px}
+.sl-stats-body{margin-top:32px}
+.sl-stats-body p{font-size:24px;line-height:1.7;color:var(--primary);font-weight:500;max-width:70%}
+
+/* Video */
+.sl-video{position:absolute;top:24%;left:7%;right:7%;bottom:7%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sl-video-el{max-width:100%;max-height:80%;border-radius:4px;border:1px solid ${accent}40}
+.sl-video-placeholder{width:80%;aspect-ratio:16/9;border:1px solid ${accent}40;background:linear-gradient(135deg,rgba(15,6,0,.8),rgba(0,0,0,.6));border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:60px;color:${accent}66}
+.sl-video-caption{font-size:18px;line-height:1.6;font-weight:500;text-align:center;margin-top:16px}
+
+/* Outro */
+.sl-outro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:0 10% 6%}
+.sl-outro-logo{height:80px;object-fit:contain;margin-bottom:16px}
+.sl-outro-title{font-size:90px;font-weight:900;letter-spacing:-3px;text-align:center;line-height:1.1}
+.sl-outro-sub{font-size:22px;font-weight:600;letter-spacing:4px;color:var(--secondary);text-align:center}
+.sl-outro-divider{width:60px;height:1px;background:${accent}66}
+.sl-outro-contact{font-size:18px;line-height:1.8;font-weight:500;text-align:center;color:var(--secondary)}
 `;
 }
 

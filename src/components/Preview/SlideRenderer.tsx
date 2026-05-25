@@ -234,6 +234,120 @@ export function SlideRenderer({ slide, kv, onDataChange }: SlideRendererProps) {
         </div>
       );
 
+    case 'timeline':
+      return (
+        <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Tag text={d.tag} accent={accent} />
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, marginBottom: 'clamp(8px, 1.5vw, 24px)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, marginBottom: 'clamp(8px, 1.5vw, 24px)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min((d.steps || []).length, 4)}, 1fr)`, gap: 'clamp(6px, 1.5vw, 20px)', flex: 1 }}>
+            {(d.steps || []).map((step, i) => (
+              <div key={i} style={{
+                padding: 'clamp(8px, 1.5vw, 26px)', border: `1px solid ${step.highlight ? accent : 'rgba(255,255,255,.1)'}`,
+                background: step.highlight ? `${accent}0f` : 'rgba(255,255,255,.02)',
+                borderRadius: 4, position: 'relative', display: 'flex', flexDirection: 'column',
+                boxShadow: step.highlight ? `0 0 30px ${accent}15` : 'none',
+              }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 3, background: accent, opacity: step.highlight ? 1 : .3 }} />
+                <div style={{ fontSize: 'clamp(7px, .9vw, 11px)', fontWeight: 700, letterSpacing: 3, color: accent, marginBottom: 'clamp(4px, .6vw, 8px)' }}>{step.stage}</div>
+                <h4 style={{ fontSize: 'clamp(10px, 1.5vw, 22px)', fontWeight: 800, lineHeight: 1.25, marginBottom: 'clamp(4px, .8vw, 10px)' }} dangerouslySetInnerHTML={{ __html: hl(step.title, accent) }} />
+                <p style={{ fontSize: 'clamp(7px, 1vw, 15px)', lineHeight: 1.6, fontWeight: 500, flex: 1 }} dangerouslySetInnerHTML={{ __html: nlbr(step.detail, accent) }} />
+                {step.metric && <div style={{ fontSize: 'clamp(10px, 1.4vw, 20px)', fontWeight: 800, color: accent, marginTop: 'clamp(4px, .8vw, 12px)', paddingTop: 'clamp(4px, .6vw, 10px)', borderTop: '1px solid rgba(255,255,255,.15)' }}>{step.metric}</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+    case 'big-number':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 'clamp(8px, 1.5vw, 20px)', padding: '0 10%' }}>
+          {d.subtitle && (onDataChange
+            ? <div style={{ fontSize: 'clamp(8px, 1vw, 13px)', fontWeight: 700, letterSpacing: 6, color: 'rgba(255,255,255,.35)' }} {...editableProps(onDataChange, 'subtitle')}>{d.subtitle}</div>
+            : <div style={{ fontSize: 'clamp(8px, 1vw, 13px)', fontWeight: 700, letterSpacing: 6, color: 'rgba(255,255,255,.35)' }}>{d.subtitle}</div>
+          )}
+          <div style={{ fontSize: 'clamp(48px, 12vw, 180px)', fontWeight: 900, letterSpacing: -6, color: accent, lineHeight: .9, textShadow: `0 0 80px ${accent}66` }} {...editableProps(onDataChange, 'number')}>{d.number}</div>
+          <div style={{ width: 1, height: 'clamp(10px, 2vw, 30px)', background: `linear-gradient(to bottom, ${accent}, transparent)` }} />
+          {onDataChange
+            ? <div style={{ fontSize: 'clamp(18px, 4vw, 60px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</div>
+            : <div style={{ fontSize: 'clamp(18px, 4vw, 60px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          {d.body && (onDataChange
+            ? <p style={{ fontSize: 'clamp(10px, 1.5vw, 22px)', lineHeight: 1.7, fontWeight: 500, textAlign: 'center', maxWidth: '70%', whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'body', true)}>{d.body}</p>
+            : <p style={{ fontSize: 'clamp(10px, 1.5vw, 22px)', lineHeight: 1.7, fontWeight: 500, textAlign: 'center', maxWidth: '70%' }} dangerouslySetInnerHTML={{ __html: nlbr(d.body, accent) }} />
+          )}
+        </div>
+      );
+
+    case 'stats':
+      return (
+        <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Tag text={d.tag} accent={accent} />
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2 }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2 }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(16px, 4vw, 60px)', alignItems: 'center', marginTop: 'clamp(12px, 2vw, 32px)' }}>
+            {(d.metrics || []).map((m, i) => (
+              <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 'clamp(24px, 5vw, 80px)', fontWeight: 800, letterSpacing: -3, color: accent, lineHeight: 1, textShadow: `0 0 40px ${accent}40` }}>{m.value}</div>
+                <div style={{ fontSize: 'clamp(7px, 1vw, 16px)', fontWeight: 700, letterSpacing: 3, color: kv.secondaryColor, marginTop: 12 }}>{m.label}</div>
+              </div>
+            ))}
+          </div>
+          {d.body && (onDataChange
+            ? <p style={{ fontSize: 'clamp(10px, 1.6vw, 24px)', lineHeight: 1.7, fontWeight: 500, marginTop: 'clamp(12px, 2vw, 32px)', maxWidth: '70%', whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'body', true)}>{d.body}</p>
+            : <p style={{ fontSize: 'clamp(10px, 1.6vw, 24px)', lineHeight: 1.7, fontWeight: 500, marginTop: 'clamp(12px, 2vw, 32px)', maxWidth: '70%' }} dangerouslySetInnerHTML={{ __html: nlbr(d.body, accent) }} />
+          )}
+        </div>
+      );
+
+    case 'video':
+      return (
+        <div style={{ padding: '7%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Tag text={d.tag} accent={accent} />
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, marginBottom: 'clamp(8px, 1.5vw, 24px)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 56px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, marginBottom: 'clamp(8px, 1.5vw, 24px)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+          }
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {d.videoUrl ? (
+              <video src={d.videoUrl} controls style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: 4, border: `1px solid ${accent}40` }} />
+            ) : (
+              <div style={{ width: '80%', aspectRatio: '16/9', border: `1px solid ${accent}40`, background: 'linear-gradient(135deg,rgba(15,6,0,.8),rgba(0,0,0,.6))', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ fontSize: 'clamp(24px, 4vw, 60px)', color: `${accent}66` }}>&#x25B6;</div>
+              </div>
+            )}
+          </div>
+          {d.body && (onDataChange
+            ? <p style={{ fontSize: 'clamp(9px, 1.2vw, 18px)', lineHeight: 1.6, fontWeight: 500, marginTop: 'clamp(6px, 1vw, 16px)', textAlign: 'center', whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'body', true)}>{d.body}</p>
+            : <p style={{ fontSize: 'clamp(9px, 1.2vw, 18px)', lineHeight: 1.6, fontWeight: 500, marginTop: 'clamp(6px, 1vw, 16px)', textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: nlbr(d.body, accent) }} />
+          )}
+        </div>
+      );
+
+    case 'outro':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 'clamp(8px, 1.5vw, 24px)', padding: '0 10%' }}>
+          {d.logoUrl && <img src={d.logoUrl} alt="" style={{ height: 'clamp(32px, 5vw, 80px)', objectFit: 'contain', marginBottom: 'clamp(4px, 1vw, 16px)' }} />}
+          {onDataChange
+            ? <h1 style={{ fontSize: 'clamp(28px, 6vw, 90px)', fontWeight: 900, letterSpacing: -3, textAlign: 'center', lineHeight: 1.1 }} {...editableProps(onDataChange, 'title')}>{d.title || 'Thank You'}</h1>
+            : <h1 style={{ fontSize: 'clamp(28px, 6vw, 90px)', fontWeight: 900, letterSpacing: -3, textAlign: 'center', lineHeight: 1.1 }} dangerouslySetInnerHTML={{ __html: hl(d.title || 'Thank You', accent) }} />
+          }
+          {d.subtitle && (onDataChange
+            ? <p style={{ fontSize: 'clamp(10px, 1.5vw, 22px)', fontWeight: 600, letterSpacing: 4, color: kv.secondaryColor, textAlign: 'center' }} {...editableProps(onDataChange, 'subtitle')}>{d.subtitle}</p>
+            : <p style={{ fontSize: 'clamp(10px, 1.5vw, 22px)', fontWeight: 600, letterSpacing: 4, color: kv.secondaryColor, textAlign: 'center' }}>{d.subtitle}</p>
+          )}
+          <div style={{ width: 60, height: 1, background: `${accent}66`, marginTop: 'clamp(4px, .5vw, 8px)', marginBottom: 'clamp(4px, .5vw, 8px)' }} />
+          {d.contactInfo && (onDataChange
+            ? <p style={{ fontSize: 'clamp(9px, 1.2vw, 18px)', lineHeight: 1.8, fontWeight: 500, textAlign: 'center', color: kv.secondaryColor, whiteSpace: 'pre-wrap' }} {...editableProps(onDataChange, 'contactInfo', true)}>{d.contactInfo}</p>
+            : <p style={{ fontSize: 'clamp(9px, 1.2vw, 18px)', lineHeight: 1.8, fontWeight: 500, textAlign: 'center', color: kv.secondaryColor }} dangerouslySetInnerHTML={{ __html: nlbr(d.contactInfo, accent) }} />
+          )}
+        </div>
+      );
+
     case 'blank':
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', opacity: .5 }}>

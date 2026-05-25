@@ -8,6 +8,11 @@ export type SlideTemplate =
   | 'quote'
   | 'image-text'
   | 'cards'
+  | 'timeline'
+  | 'big-number'
+  | 'stats'
+  | 'video'
+  | 'outro'
   | 'blank';
 
 export type EntryAnimation = 'none' | 'fadeUp' | 'fadeIn' | 'scaleIn';
@@ -31,6 +36,14 @@ export interface MetricItem {
 export interface CardItem {
   title: string;
   body: string;
+  highlight?: boolean;
+}
+
+export interface TimelineStep {
+  stage: string;
+  title: string;
+  detail: string;
+  metric?: string;
   highlight?: boolean;
 }
 
@@ -59,6 +72,10 @@ export interface TemplateData {
   imageUrl?: string;
   imagePosition?: 'left' | 'right';
   cards?: CardItem[];
+  steps?: TimelineStep[];
+  videoUrl?: string;
+  logoUrl?: string;
+  contactInfo?: string;
 }
 
 export interface Slide {
@@ -83,5 +100,10 @@ export const TEMPLATE_LABELS: Record<SlideTemplate, string> = {
   'quote': '인용',
   'image-text': '이미지+텍스트',
   'cards': '카드 그리드',
+  'timeline': '타임라인/프로세스',
+  'big-number': '큰 숫자+텍스트',
+  'stats': '통계 카드',
+  'video': '비디오 임베드',
+  'outro': '엔딩/감사',
   'blank': '자유 편집',
 };

@@ -267,9 +267,150 @@ function TemplateFields({
       );
     }
 
+    case 'timeline': {
+      const steps = (d.steps as Array<{ stage: string; title: string; detail: string; metric?: string; highlight?: boolean }>) || [];
+      return (
+        <>
+          <Field label="태그"><Input value={(d.tag as string) || ''} onChange={(v) => setData({ tag: v })} /></Field>
+          <Field label="제목"><Input value={(d.title as string) || ''} onChange={(v) => setData({ title: v })} /></Field>
+          {steps.map((step, i) => (
+            <div key={i} className="te-card-edit">
+              <div className="te-card-header">
+                <span>스텝 {i + 1}</span>
+                <label style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+                  <input type="checkbox" checked={step.highlight || false} onChange={(e) => {
+                    const newSteps = [...steps];
+                    newSteps[i] = { ...step, highlight: e.target.checked };
+                    setData({ steps: newSteps });
+                  }} /> 강조
+                </label>
+                <button className="btn-icon danger" onClick={() => setData({ steps: steps.filter((_, j) => j !== i) })}>&times;</button>
+              </div>
+              <Field label="단계"><Input value={step.stage} onChange={(v) => {
+                const newSteps = [...steps];
+                newSteps[i] = { ...step, stage: v };
+                setData({ steps: newSteps });
+              }} placeholder="STEP 1" /></Field>
+              <Field label="제목"><Input value={step.title} onChange={(v) => {
+                const newSteps = [...steps];
+                newSteps[i] = { ...step, title: v };
+                setData({ steps: newSteps });
+              }} /></Field>
+              <Field label="설명"><TextArea value={step.detail} onChange={(v) => {
+                const newSteps = [...steps];
+                newSteps[i] = { ...step, detail: v };
+                setData({ steps: newSteps });
+              }} rows={2} /></Field>
+              <Field label="지표 (선택)"><Input value={step.metric || ''} onChange={(v) => {
+                const newSteps = [...steps];
+                newSteps[i] = { ...step, metric: v };
+                setData({ steps: newSteps });
+              }} placeholder="예: +42%" /></Field>
+            </div>
+          ))}
+          <button className="btn-small" onClick={() => setData({ steps: [...steps, { stage: 'STEP', title: '제목', detail: '설명', highlight: false }] })}>+ 스텝 추가</button>
+        </>
+      );
+    }
+
+    case 'big-number':
+      return (
+        <>
+          <Field label="숫자"><Input value={(d.number as string) || ''} onChange={(v) => setData({ number: v })} placeholder="42%" /></Field>
+          <Field label="제목"><Input value={(d.title as string) || ''} onChange={(v) => setData({ title: v })} /></Field>
+          <Field label="본문"><TextArea value={(d.body as string) || ''} onChange={(v) => setData({ body: v })} rows={3} /></Field>
+        </>
+      );
+
+    case 'stats': {
+      const metrics = (d.metrics as Array<{ value: string; label: string }>) || [];
+      return (
+        <>
+          <Field label="태그"><Input value={(d.tag as string) || ''} onChange={(v) => setData({ tag: v })} /></Field>
+          <Field label="제목"><Input value={(d.title as string) || ''} onChange={(v) => setData({ title: v })} /></Field>
+          {metrics.map((m, i) => (
+            <div key={i} className="property-row">
+              <Field label={`지표 ${i + 1} 값`}>
+                <Input value={m.value} onChange={(v) => {
+                  const newMetrics = [...metrics];
+                  newMetrics[i] = { ...m, value: v };
+                  setData({ metrics: newMetrics });
+                }} />
+              </Field>
+              <Field label={`지표 ${i + 1} 라벨`}>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <Input value={m.label} onChange={(v) => {
+                    const newMetrics = [...metrics];
+                    newMetrics[i] = { ...m, label: v };
+                    setData({ metrics: newMetrics });
+                  }} />
+                  <button className="btn-icon danger" onClick={() => setData({ metrics: metrics.filter((_, j) => j !== i) })}>&times;</button>
+                </div>
+              </Field>
+            </div>
+          ))}
+          <button className="btn-small" onClick={() => setData({ metrics: [...metrics, { value: '0', label: '라벨' }] })}>+ 지표 추가</button>
+          <Field label="본문"><TextArea value={(d.body as string) || ''} onChange={(v) => setData({ body: v })} rows={4} /></Field>
+        </>
+      );
+    }
+
+    case 'video':
+      return (
+        <>
+          <Field label="제목"><Input value={(d.title as string) || ''} onChange={(v) => setData({ title: v })} /></Field>
+          <Field label="비디오 URL"><Input value={(d.videoUrl as string) || ''} onChange={(v) => setData({ videoUrl: v })} placeholder="https://..." /></Field>
+          <Field label="본문"><TextArea value={(d.body as string) || ''} onChange={(v) => setData({ body: v })} rows={2} /></Field>
+        </>
+      );
+
+    case 'outro':
+      return <OutroFields data={d} setData={setData} />;
+
     case 'blank':
       return <p className="te-hint">자유 편집 모드입니다. 미리보기에서 슬라이드 이름이 표시됩니다.</p>;
   }
+}
+
+function OutroFields({ data: d, setData }: { data: TemplateData; setData: (patch: Partial<TemplateData>) => void }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setData({ logoUrl: reader.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <>
+      <Field label="제목"><Input value={(d.title as string) || ''} onChange={(v) => setData({ title: v })} placeholder="Thank You" /></Field>
+      <Field label="부제목"><Input value={(d.subtitle as string) || ''} onChange={(v) => setData({ subtitle: v })} /></Field>
+      <Field label="연락처 정보"><TextArea value={(d.contactInfo as string) || ''} onChange={(v) => setData({ contactInfo: v })} rows={3} /></Field>
+      <Field label="로고">
+        <div className="image-upload-group">
+          <Input value={(d.logoUrl as string) || ''} onChange={(v) => setData({ logoUrl: v })} placeholder="https://... 또는 파일 업로드" />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleLogoUpload}
+          />
+          <button className="btn-upload" onClick={() => fileInputRef.current?.click()}>파일 업로드</button>
+        </div>
+        {d.logoUrl && (
+          <div className="image-upload-thumb">
+            <img src={d.logoUrl} alt="로고 미리보기" />
+            <button className="btn-icon danger" onClick={() => setData({ logoUrl: '' })}>&times;</button>
+          </div>
+        )}
+      </Field>
+    </>
+  );
 }
 
 function ImageTextFields({ data: d, setData }: { data: TemplateData; setData: (patch: Partial<TemplateData>) => void }) {

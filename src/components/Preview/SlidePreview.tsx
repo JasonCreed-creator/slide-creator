@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
 import { SlideRenderer } from './SlideRenderer';
+import { Starfield } from './Starfield';
 import type { TransitionType } from '@/types';
 
 const TRANSITION_CSS: Record<TransitionType, { enter: React.CSSProperties; exit: React.CSSProperties }> = {
@@ -144,8 +145,12 @@ export function SlidePreview() {
         aspectRatio: `${project.screen.widthPx} / ${project.screen.heightPx}`,
         background: kv.gradientCss || kv.backgroundColor,
         color: kv.primaryColor, fontFamily: kv.fontFamily,
-        overflow: 'hidden',
+        overflow: 'hidden', position: 'relative',
       }}>
+        <Starfield active={project.starfield} />
+        {kv.backgroundImage && (
+          <img src={kv.backgroundImage} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, pointerEvents: 'none' }} />
+        )}
         {prevIndex !== null && slides[prevIndex] && (
           <div style={{ ...getExitStyle(), background: slides[prevIndex].backgroundColor || 'transparent' }}>
             <SlideRenderer slide={slides[prevIndex]} kv={kv} />
