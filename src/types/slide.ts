@@ -1,3 +1,5 @@
+import type { BackgroundEffect, ContentAnimationType } from './effects';
+
 export type ContentType = 'text' | 'image' | 'video' | 'shape' | 'timer' | 'logo';
 
 export interface SlideContent {
@@ -19,6 +21,9 @@ export interface Slide {
   contents: SlideContent[];
   transition: TransitionType;
   duration: number;
+  backgroundEffect?: BackgroundEffect;
+  contentAnimation?: ContentAnimationType;
+  subtitle?: string;
 }
 
 export type TransitionType =
@@ -30,4 +35,12 @@ export type TransitionType =
   | 'slide-down'
   | 'zoom-in'
   | 'zoom-out'
-  | 'dissolve';
+  | 'dissolve'
+  | 'cube'
+  | 'flip-x'
+  | 'flip-y'
+  | 'morph'
+  | 'glitch'
+  | 'wipe-left'
+  | 'wipe-right'
+  | 'iris';

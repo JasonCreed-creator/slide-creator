@@ -14,6 +14,7 @@ export function ScreenConfig() {
 
   const handleSelect = (preset: ScreenSpec) => {
     setScreen(preset);
+    setCustomMode(false);
   };
 
   const handleCustomApply = () => {
@@ -26,7 +27,7 @@ export function ScreenConfig() {
     <div className="editor-panel">
       <h2>스크린 규격 설정</h2>
       <p className="panel-description">
-        컨퍼런스 스크린의 물리적 크기를 설정합니다.
+        컨퍼런스 스크린의 물리적 크기를 설정합니다. 프리셋을 선택하거나 커스텀 크기를 입력하세요.
       </p>
 
       <div className="preset-grid">
@@ -44,7 +45,7 @@ export function ScreenConfig() {
             />
             <span className="preset-name">{preset.name}</span>
             <span className="preset-detail">
-              {preset.widthMm / 1000}m × {preset.heightMm / 1000}m · {preset.aspectRatio}
+              {preset.widthMm / 1000}m x {preset.heightMm / 1000}m · {preset.aspectRatio}
             </span>
           </button>
         ))}
@@ -55,6 +56,7 @@ export function ScreenConfig() {
         >
           <div className="preset-preview custom-icon">+</div>
           <span className="preset-name">커스텀</span>
+          <span className="preset-detail">직접 크기 입력</span>
         </button>
       </div>
 
@@ -66,30 +68,33 @@ export function ScreenConfig() {
               type="text"
               value={customName}
               onChange={(e) => setCustomName(e.target.value)}
+              placeholder="스크린 이름"
             />
           </label>
-          <label>
-            너비 (mm)
-            <input
-              type="number"
-              value={customWidth}
-              onChange={(e) => setCustomWidth(Number(e.target.value))}
-              min={1000}
-              max={50000}
-            />
-          </label>
-          <label>
-            높이 (mm)
-            <input
-              type="number"
-              value={customHeight}
-              onChange={(e) => setCustomHeight(Number(e.target.value))}
-              min={1000}
-              max={20000}
-            />
-          </label>
+          <div className="inline-row">
+            <label>
+              너비 (mm)
+              <input
+                type="number"
+                value={customWidth}
+                onChange={(e) => setCustomWidth(Number(e.target.value))}
+                min={1000}
+                max={50000}
+              />
+            </label>
+            <label>
+              높이 (mm)
+              <input
+                type="number"
+                value={customHeight}
+                onChange={(e) => setCustomHeight(Number(e.target.value))}
+                min={1000}
+                max={20000}
+              />
+            </label>
+          </div>
           <button className="btn-primary" onClick={handleCustomApply}>
-            적용
+            <span>적용</span>
           </button>
         </div>
       )}
@@ -97,8 +102,9 @@ export function ScreenConfig() {
       <MiniPreview />
 
       <div className="panel-actions">
+        <div />
         <button className="btn-primary" onClick={() => setEditorStep('layout')}>
-          다음: 레이아웃 설정 →
+          <span>다음: 레이아웃 설정 →</span>
         </button>
       </div>
     </div>

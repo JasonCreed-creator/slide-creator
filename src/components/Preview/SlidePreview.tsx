@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
-import type { TransitionType } from '@/types';
+import { BackgroundRenderer } from '@/components/Effects';
+import type { TransitionType, ContentAnimationType } from '@/types';
 
 function getTransitionStyle(
   transition: TransitionType,
@@ -9,24 +10,73 @@ function getTransitionStyle(
   const base: React.CSSProperties = {
     position: 'absolute',
     inset: 0,
-    transition: 'all 0.6s ease-in-out',
+    transition: 'all 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+    backfaceVisibility: 'hidden',
   };
 
   if (phase === 'idle') return { ...base, opacity: 1, transform: 'none' };
 
-  const hidden: Record<TransitionType, React.CSSProperties> = {
+  const styles: Record<TransitionType, React.CSSProperties> = {
     none: { opacity: 1 },
     fade: { opacity: 0 },
-    dissolve: { opacity: 0, filter: 'blur(8px)' },
+    dissolve: { opacity: 0, filter: 'blur(12px)' },
     'slide-left': { transform: phase === 'enter' ? 'translateX(100%)' : 'translateX(-100%)' },
     'slide-right': { transform: phase === 'enter' ? 'translateX(-100%)' : 'translateX(100%)' },
     'slide-up': { transform: phase === 'enter' ? 'translateY(100%)' : 'translateY(-100%)' },
     'slide-down': { transform: phase === 'enter' ? 'translateY(-100%)' : 'translateY(100%)' },
-    'zoom-in': { opacity: 0, transform: phase === 'enter' ? 'scale(0.5)' : 'scale(1.5)' },
-    'zoom-out': { opacity: 0, transform: phase === 'enter' ? 'scale(1.5)' : 'scale(0.5)' },
+    'zoom-in': { opacity: 0, transform: phase === 'enter' ? 'scale(0.3)' : 'scale(1.5)' },
+    'zoom-out': { opacity: 0, transform: phase === 'enter' ? 'scale(1.8)' : 'scale(0.3)' },
+    cube: {
+      transform: phase === 'enter'
+        ? 'perspective(1200px) rotateY(90deg)'
+        : 'perspective(1200px) rotateY(-90deg)',
+      opacity: phase === 'enter' ? 0 : 1,
+      transformOrigin: phase === 'enter' ? 'left center' : 'right center',
+    },
+    'flip-x': {
+      transform: phase === 'enter'
+        ? 'perspective(1200px) rotateY(180deg)'
+        : 'perspective(1200px) rotateY(-180deg)',
+      opacity: 0,
+    },
+    'flip-y': {
+      transform: phase === 'enter'
+        ? 'perspective(1200px) rotateX(180deg)'
+        : 'perspective(1200px) rotateX(-180deg)',
+      opacity: 0,
+    },
+    morph: {
+      opacity: 0,
+      transform: phase === 'enter' ? 'scale(0.8) rotate(5deg)' : 'scale(1.2) rotate(-5deg)',
+      filter: 'blur(6px)',
+    },
+    glitch: {
+      opacity: 0,
+      transform: phase === 'enter'
+        ? 'translateX(10px) skewX(5deg)'
+        : 'translateX(-10px) skewX(-5deg)',
+      filter: 'hue-rotate(90deg) saturate(2)',
+    },
+    'wipe-left': {
+      clipPath: phase === 'enter' ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)',
+      transition: 'clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+    'wipe-right': {
+      clipPath: phase === 'enter' ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)',
+      transition: 'clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+    iris: {
+      clipPath: phase === 'enter' ? 'circle(0% at 50% 50%)' : 'circle(0% at 50% 50%)',
+      transition: 'clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+    },
   };
 
-  return { ...base, ...hidden[transition] };
+  return { ...base, ...styles[transition] };
+}
+
+function getContentAnimClass(anim?: ContentAnimationType): string {
+  if (!anim || anim === 'none') return '';
+  return `content-animate-${anim}`;
 }
 
 export function SlidePreview() {
@@ -37,6 +87,7 @@ export function SlidePreview() {
   const [transitionPhase, setTransitionPhase] = useState<'idle' | 'exiting' | 'entering'>('idle');
   const [displayIndex, setDisplayIndex] = useState(0);
   const [elapsed, setElapsed] = useState(0);
+  const [animKey, setAnimKey] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<number>(0);
 
@@ -53,8 +104,9 @@ export function SlidePreview() {
         setDisplayIndex(nextIndex);
         setCurrentIndex(nextIndex);
         setTransitionPhase('entering');
+        setAnimKey((k) => k + 1);
         setTimeout(() => setTransitionPhase('idle'), 50);
-      }, 600);
+      }, 700);
     },
     [slides.length, displayIndex],
   );
@@ -130,6 +182,9 @@ export function SlidePreview() {
   };
 
   const transition = currentSlide?.transition ?? 'fade';
+  const activeEffect = currentSlide?.backgroundEffect?.type !== 'none'
+    ? currentSlide?.backgroundEffect
+    : kv.backgroundEffect;
 
   return (
     <div
@@ -139,7 +194,7 @@ export function SlidePreview() {
       {!isFullscreen && (
         <div className="preview-toolbar">
           <button className="btn-secondary" onClick={() => setEditorStep('slides')}>
-            ← 편집으로 돌아가기
+            ← 편집
           </button>
           <div className="preview-info">
             <span className="preview-spec">
@@ -147,12 +202,7 @@ export function SlidePreview() {
             </span>
           </div>
           <div className="preview-controls">
-            <button
-              className="btn-icon"
-              onClick={goPrev}
-              disabled={!hasSlides}
-              title="이전 (←)"
-            >
+            <button className="btn-icon" onClick={goPrev} disabled={!hasSlides} title="이전 (←)">
               ◀
             </button>
             <button
@@ -163,12 +213,7 @@ export function SlidePreview() {
             >
               {isPlaying ? '⏸' : '▶'}
             </button>
-            <button
-              className="btn-icon"
-              onClick={goNext}
-              disabled={!hasSlides}
-              title="다음 (→)"
-            >
+            <button className="btn-icon" onClick={goNext} disabled={!hasSlides} title="다음 (→)">
               ▶
             </button>
             {hasSlides && (
@@ -176,11 +221,7 @@ export function SlidePreview() {
                 {currentIndex + 1} / {slides.length}
               </span>
             )}
-            <button
-              className="btn-icon fullscreen-btn"
-              onClick={toggleFullscreen}
-              title="풀스크린 (F)"
-            >
+            <button className="btn-icon fullscreen-btn" onClick={toggleFullscreen} title="풀스크린 (F)">
               ⛶
             </button>
           </div>
@@ -194,7 +235,7 @@ export function SlidePreview() {
               key={slide.id}
               className={`timeline-segment ${i === currentIndex ? 'active' : ''} ${i < currentIndex ? 'done' : ''}`}
               onClick={() => transitionTo(i)}
-              title={slide.label}
+              title={`${slide.label} (${slide.duration / 1000}s)`}
             >
               <div
                 className="timeline-fill"
@@ -215,8 +256,11 @@ export function SlidePreview() {
           background: kv.gradientCss || kv.backgroundColor,
           color: kv.primaryColor,
           fontFamily: kv.fontFamily,
+          perspective: '1200px',
         }}
       >
+        <BackgroundRenderer effect={activeEffect} />
+
         {project.layout.zones.map((zone) => (
           <div
             key={zone.id}
@@ -244,8 +288,14 @@ export function SlidePreview() {
                   : getTransitionStyle(transition, 'enter')
             }
           >
-            <div className="slide-center-content">
+            <div
+              key={animKey}
+              className={`slide-center-content ${transitionPhase === 'idle' ? getContentAnimClass(currentSlide.contentAnimation) : ''}`}
+            >
               <h2 className="slide-title">{currentSlide.label}</h2>
+              {currentSlide.subtitle && (
+                <p className="slide-subtitle">{currentSlide.subtitle}</p>
+              )}
               {currentSlide.transition !== 'none' && (
                 <span className="slide-transition-badge">{currentSlide.transition}</span>
               )}
@@ -281,10 +331,10 @@ export function SlidePreview() {
 
       {!isFullscreen && (
         <div className="preview-shortcuts">
-          <span>← → 슬라이드 이동</span>
-          <span>Space 재생/정지</span>
-          <span>F 풀스크린</span>
-          <span>Esc 편집으로</span>
+          <span><span className="shortcut-key">←</span><span className="shortcut-key">→</span> 이동</span>
+          <span><span className="shortcut-key">Space</span> 재생</span>
+          <span><span className="shortcut-key">F</span> 풀스크린</span>
+          <span><span className="shortcut-key">Esc</span> 편집</span>
         </div>
       )}
     </div>

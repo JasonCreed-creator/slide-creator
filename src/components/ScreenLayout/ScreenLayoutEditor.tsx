@@ -14,7 +14,7 @@ export function ScreenLayoutEditor() {
     <div className="editor-panel">
       <h2>스크린 구성 설정</h2>
       <p className="panel-description">
-        스크린을 어떤 영역으로 나눌지 설정합니다.
+        스크린을 어떤 영역으로 나눌지 설정합니다. 각 영역에 독립적인 콘텐츠를 배치할 수 있습니다.
       </p>
 
       <div className="preset-grid">
@@ -54,7 +54,7 @@ export function ScreenLayoutEditor() {
           ← 이전
         </button>
         <button className="btn-primary" onClick={() => setEditorStep('keyvisual')}>
-          다음: 키비주얼 →
+          <span>다음: 키비주얼 →</span>
         </button>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import type { BackgroundEffect } from './effects';
+
 export interface KeyVisual {
   id: string;
   name: string;
@@ -9,4 +11,5 @@ export interface KeyVisual {
   accentColor: string;
   fontFamily: string;
   headingFontFamily?: string;
+  backgroundEffect?: BackgroundEffect;
 }

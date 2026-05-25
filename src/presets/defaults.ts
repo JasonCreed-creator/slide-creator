@@ -113,6 +113,7 @@ export const DEFAULT_KEY_VISUAL: KeyVisual = {
   secondaryColor: '#a0a0b0',
   accentColor: '#4f8cff',
   fontFamily: "'Pretendard', 'Apple SD Gothic Neo', sans-serif",
+  backgroundEffect: { type: 'none' },
 };
 
 export const KEY_VISUAL_PRESETS: KeyVisual[] = [
@@ -126,6 +127,18 @@ export const KEY_VISUAL_PRESETS: KeyVisual[] = [
     secondaryColor: '#8892b0',
     accentColor: '#64ffda',
     fontFamily: "'Pretendard', monospace",
+    backgroundEffect: {
+      type: 'particles',
+      particles: {
+        count: 40,
+        color: 'rgba(100, 255, 218, 0.3)',
+        minSize: 1,
+        maxSize: 2,
+        speed: 0.3,
+        connected: true,
+        shape: 'circle',
+      },
+    },
   },
   {
     id: 'warm-corporate',
@@ -136,6 +149,14 @@ export const KEY_VISUAL_PRESETS: KeyVisual[] = [
     secondaryColor: '#b0b0b0',
     accentColor: '#e94560',
     fontFamily: "'Pretendard', sans-serif",
+    backgroundEffect: {
+      type: 'gradient-flow',
+      gradientFlow: {
+        colors: ['#e94560', '#0f3460', '#16213e', '#e94560'],
+        speed: 10,
+        angle: 135,
+      },
+    },
   },
   {
     id: 'nature-green',
@@ -146,5 +167,86 @@ export const KEY_VISUAL_PRESETS: KeyVisual[] = [
     secondaryColor: '#a5d6a7',
     accentColor: '#66bb6a',
     fontFamily: "'Pretendard', sans-serif",
+    backgroundEffect: {
+      type: 'aurora',
+      aurora: {
+        colors: ['#66bb6a', '#26a69a', '#00897b'],
+        speed: 5,
+        intensity: 0.5,
+      },
+    },
+  },
+  {
+    id: 'cosmic-purple',
+    name: '코스믹 퍼플',
+    backgroundColor: '#0d0221',
+    gradientCss: 'radial-gradient(ellipse at 20% 50%, #1a0533 0%, #0d0221 50%, #070111 100%)',
+    primaryColor: '#f0e6ff',
+    secondaryColor: '#b794f4',
+    accentColor: '#a855f7',
+    fontFamily: "'Pretendard', sans-serif",
+    backgroundEffect: {
+      type: 'starfield',
+      starfield: {
+        density: 120,
+        speed: 0.2,
+        color: '#e9d5ff',
+      },
+    },
+  },
+  {
+    id: 'neon-cyber',
+    name: '네온 사이버',
+    backgroundColor: '#0a0a0a',
+    gradientCss: 'linear-gradient(180deg, #0a0a0a 0%, #0d0d1a 100%)',
+    primaryColor: '#00ff88',
+    secondaryColor: '#00ccff',
+    accentColor: '#ff0080',
+    fontFamily: "'Pretendard', monospace",
+    backgroundEffect: {
+      type: 'geometric',
+      geometric: {
+        shape: 'circuit',
+        color: 'rgba(0, 255, 136, 0.08)',
+        opacity: 0.6,
+        size: 60,
+      },
+    },
+  },
+  {
+    id: 'sunset-warm',
+    name: '선셋 웜',
+    backgroundColor: '#1a0a00',
+    gradientCss: 'linear-gradient(135deg, #1a0a00 0%, #2d1400 30%, #3d1a00 60%, #1a0a00 100%)',
+    primaryColor: '#fff3e0',
+    secondaryColor: '#ffcc80',
+    accentColor: '#ff6d00',
+    fontFamily: "'Pretendard', sans-serif",
+    backgroundEffect: {
+      type: 'gradient-flow',
+      gradientFlow: {
+        colors: ['#ff6d00', '#ff9100', '#ffab00', '#ff6d00'],
+        speed: 12,
+        angle: 45,
+      },
+    },
+  },
+  {
+    id: 'ocean-deep',
+    name: '딥 오션',
+    backgroundColor: '#001220',
+    gradientCss: 'radial-gradient(ellipse at 50% 100%, #002040 0%, #001220 60%, #000810 100%)',
+    primaryColor: '#e0f7fa',
+    secondaryColor: '#80deea',
+    accentColor: '#00bcd4',
+    fontFamily: "'Pretendard', sans-serif",
+    backgroundEffect: {
+      type: 'aurora',
+      aurora: {
+        colors: ['#00bcd4', '#0097a7', '#006064'],
+        speed: 6,
+        intensity: 0.4,
+      },
+    },
   },
 ];

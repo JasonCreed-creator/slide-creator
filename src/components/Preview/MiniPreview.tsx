@@ -1,4 +1,5 @@
 import { useProjectStore } from '@/stores/projectStore';
+import { BackgroundRenderer } from '@/components/Effects';
 
 export function MiniPreview() {
   const { project } = useProjectStore();
@@ -16,6 +17,7 @@ export function MiniPreview() {
           fontFamily: kv.fontFamily,
         }}
       >
+        <BackgroundRenderer effect={kv.backgroundEffect} />
         {project.layout.zones.map((zone) => (
           <div
             key={zone.id}
@@ -33,9 +35,12 @@ export function MiniPreview() {
         ))}
       </div>
       <div className="mini-preview-meta">
-        <span>{project.screen.widthMm / 1000}m × {project.screen.heightMm / 1000}m</span>
+        <span>{project.screen.widthMm / 1000}m x {project.screen.heightMm / 1000}m</span>
         <span>{project.screen.aspectRatio}</span>
         <span>{project.layout.zones.length}개 영역</span>
+        {kv.backgroundEffect && kv.backgroundEffect.type !== 'none' && (
+          <span className="effect-badge">{kv.backgroundEffect.type}</span>
+        )}
       </div>
     </div>
   );

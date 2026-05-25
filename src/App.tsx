@@ -7,12 +7,12 @@ import { ScreenPlayEditor } from '@/components/ScreenPlay';
 import { SlidePreview } from '@/components/Preview';
 import './styles/global.css';
 
-const STEPS: { key: EditorStep; label: string }[] = [
-  { key: 'screen', label: '스크린 규격' },
-  { key: 'layout', label: '스크린 구성' },
-  { key: 'keyvisual', label: '키비주얼' },
-  { key: 'slides', label: '슬라이드' },
-  { key: 'preview', label: '미리보기' },
+const STEPS: { key: EditorStep; label: string; icon: string }[] = [
+  { key: 'screen', label: '스크린 규격', icon: '⬚' },
+  { key: 'layout', label: '스크린 구성', icon: '⊞' },
+  { key: 'keyvisual', label: '키비주얼', icon: '◆' },
+  { key: 'slides', label: '슬라이드', icon: '▦' },
+  { key: 'preview', label: '미리보기', icon: '▶' },
 ];
 
 function StepPanel() {
