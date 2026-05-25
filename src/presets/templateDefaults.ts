@@ -49,6 +49,45 @@ export function getDefaultData(template: SlideTemplate): TemplateData {
           { title: '포인트 3', body: '설명을 입력하세요', highlight: false },
         ],
       };
+    case 'timeline':
+      return {
+        tag: 'PROCESS', title: '프로세스 단계',
+        steps: [
+          { stage: 'STEP 01', title: '리서치', detail: '타겟 고객 분석', metric: '2주', highlight: false },
+          { stage: 'STEP 02', title: '전략 수립', detail: '핵심 메시지 도출', metric: '1주', highlight: true },
+          { stage: 'STEP 03', title: '실행', detail: '캠페인 런칭', metric: '4주', highlight: false },
+          { stage: 'STEP 04', title: '성과 분석', detail: 'KPI 리뷰', metric: '1주', highlight: false },
+        ],
+      };
+    case 'big-number':
+      return {
+        tag: 'KEY INSIGHT', number: '320%',
+        title: '핵심 숫자가 말하는 것',
+        body: '이 숫자의 의미와 맥락을 설명합니다.',
+      };
+    case 'stats':
+      return {
+        tag: 'PERFORMANCE', title: '성과 분석',
+        metrics: [
+          { value: '1,247', label: '총 리드' },
+          { value: '28.5%', label: '전환율' },
+          { value: '₩4.2M', label: '매출' },
+        ],
+        body: '전년 대비 현저한 성장세를 보이고 있으며, 특히 전환율이 크게 개선되었습니다.',
+      };
+    case 'video':
+      return {
+        tag: 'DEMO', title: '데모 영상',
+        videoUrl: '',
+        body: '영상 URL을 입력하세요 (MP4)',
+      };
+    case 'outro':
+      return {
+        title: 'Thank You',
+        subtitle: '질문이 있으시면 말씀해주세요',
+        contactInfo: 'name@company.com',
+        logoUrl: '',
+      };
     case 'blank':
       return {};
   }

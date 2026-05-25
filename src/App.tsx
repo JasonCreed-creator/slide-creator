@@ -7,6 +7,8 @@ import { KeyVisualEditor } from '@/components/KeyVisual';
 import { ScreenPlayEditor } from '@/components/ScreenPlay';
 import { SlidePreview } from '@/components/Preview';
 import { exportToHtml } from '@/utils/htmlExporter';
+import { BG_EFFECT_LABELS } from '@/types';
+import type { BackgroundEffect } from '@/types';
 import './styles/global.css';
 
 const STEPS: { key: EditorStep; label: string }[] = [
@@ -33,7 +35,7 @@ function SaveLoadMenu() {
   const {
     project, savedProjects, saveProject, loadProject, deleteSavedProject,
     resetProject, refreshSavedProjects, exportProjectJson, importProjectJson,
-    setProjectName, setStarfield,
+    setProjectName, setBackgroundEffect,
   } = useProjectStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -71,9 +73,13 @@ function SaveLoadMenu() {
                 프로젝트 이름
                 <input type="text" value={project.name} onChange={(e) => setProjectName(e.target.value)} />
               </label>
-              <label className="prop-label" style={{ flexDirection: 'row', gap: 8, alignItems: 'center', marginTop: 8 }}>
-                <input type="checkbox" checked={project.starfield} onChange={(e) => setStarfield(e.target.checked)} />
-                별 배경 효과 (스타필드)
+              <label className="prop-label" style={{ marginTop: 8 }}>
+                배경 효과
+                <select value={project.backgroundEffect} onChange={(e) => setBackgroundEffect(e.target.value as BackgroundEffect)}>
+                  {Object.entries(BG_EFFECT_LABELS).map(([k, v]) => (
+                    <option key={k} value={k}>{v}</option>
+                  ))}
+                </select>
               </label>
             </div>
             <div className="menu-section">

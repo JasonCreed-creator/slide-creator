@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Project, ScreenSpec, ScreenLayout, KeyVisual, Slide, TemplateData, SlideTemplate } from '@/types';
+import type { Project, ScreenSpec, ScreenLayout, KeyVisual, Slide, TemplateData, SlideTemplate, BackgroundEffect } from '@/types';
 import { DEFAULT_SCREEN, DEFAULT_LAYOUT, DEFAULT_KEY_VISUAL } from '@/presets/defaults';
 import { createSlideFromTemplate } from '@/presets/templateDefaults';
 
@@ -21,7 +21,7 @@ interface ProjectState {
   setLayout: (layout: ScreenLayout) => void;
   setKeyVisual: (kv: KeyVisual) => void;
   setProjectName: (name: string) => void;
-  setStarfield: (enabled: boolean) => void;
+  setBackgroundEffect: (effect: BackgroundEffect) => void;
 
   addSlideFromTemplate: (template: SlideTemplate) => void;
   updateSlide: (id: string, patch: Partial<Slide>) => void;
@@ -54,7 +54,7 @@ function createDefaultProject(): Project {
     layout: DEFAULT_LAYOUT,
     keyVisual: DEFAULT_KEY_VISUAL,
     slides: [],
-    starfield: true,
+    backgroundEffect: 'starfield',
   };
 }
 
@@ -87,8 +87,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   setProjectName: (name) =>
     set((s) => ({ project: { ...s.project, name, updatedAt: new Date().toISOString() } })),
 
-  setStarfield: (enabled) =>
-    set((s) => ({ project: { ...s.project, starfield: enabled, updatedAt: new Date().toISOString() } })),
+  setBackgroundEffect: (effect) =>
+    set((s) => ({ project: { ...s.project, backgroundEffect: effect, updatedAt: new Date().toISOString() } })),
 
   addSlideFromTemplate: (template) =>
     set((s) => {
