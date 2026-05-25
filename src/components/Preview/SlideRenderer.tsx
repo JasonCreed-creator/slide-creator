@@ -413,10 +413,11 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
       );
     }
 
-    case 'image-text':
+    case 'image-text': {
+      const imgPct = d.imageSplit ?? 50;
       return (
         <div style={{ display: 'flex', flexDirection: d.imagePosition === 'right' ? 'row-reverse' : 'row', height: '100%' }}>
-          <div style={{ flex: '0 0 50%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: `${accent}08` }}>
+          <div style={{ flex: `0 0 ${imgPct}%`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: `${accent}08` }}>
             {d.imageUrl ? (
               <img src={d.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} draggable={false} />
             ) : (
@@ -426,7 +427,7 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
               </div>
             )}
           </div>
-          <div style={{ flex: '0 0 50%', padding: '7%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ flex: `0 0 ${100 - imgPct}%`, padding: '7%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <Tag text={d.tag} accent={accent} />
             {onDataChange
               ? <h1 style={{ fontSize: 'clamp(16px, 3.5vw, 48px)', fontWeight: 800, lineHeight: 1.15, letterSpacing: -2, textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
@@ -439,6 +440,7 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
           </div>
         </div>
       );
+    }
 
     case 'cards':
       return (

@@ -116,6 +116,7 @@ export interface TemplateData {
   attribution?: string;
   imageUrl?: string;
   imagePosition?: 'left' | 'right';
+  imageSplit?: number;
   cards?: CardItem[];
   steps?: TimelineStep[];
   videoUrl?: string;

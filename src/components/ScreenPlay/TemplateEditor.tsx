@@ -481,13 +481,7 @@ function TemplateFields({
     }
 
     case 'video':
-      return (
-        <>
-          <Field label="제목"><Input value={(d.title as string) || ''} onChange={(v) => setData({ title: v })} /></Field>
-          <Field label="비디오 URL"><Input value={(d.videoUrl as string) || ''} onChange={(v) => setData({ videoUrl: v })} placeholder="https://..." /></Field>
-          <Field label="본문"><TextArea value={(d.body as string) || ''} onChange={(v) => setData({ body: v })} rows={2} /></Field>
-        </>
-      );
+      return <VideoFields data={d} setData={setData} />;
 
     case 'outro':
       return <OutroFields data={d} setData={setData} />;
@@ -495,6 +489,33 @@ function TemplateFields({
     case 'blank':
       return <p className="te-hint">자유 편집 모드입니다. 미리보기에서 슬라이드 이름이 표시됩니다.</p>;
   }
+}
+
+function VideoFields({ data: d, setData }: { data: TemplateData; setData: (patch: Partial<TemplateData>) => void }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setData({ videoUrl: reader.result as string });
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <>
+      <Field label="제목"><Input value={(d.title as string) || ''} onChange={(v) => setData({ title: v })} /></Field>
+      <Field label="비디오">
+        <div className="image-upload-group">
+          <Input value={(d.videoUrl as string) || ''} onChange={(v) => setData({ videoUrl: v })} placeholder="URL 또는 파일 업로드" />
+          <input ref={fileInputRef} type="file" accept="video/*" style={{ display: 'none' }} onChange={handleVideoUpload} />
+          <button className="btn-upload" onClick={() => fileInputRef.current?.click()}>파일 업로드</button>
+        </div>
+        {d.videoUrl && <p className="te-hint" style={{ marginTop: 4 }}>비디오 설정됨</p>}
+      </Field>
+      <Field label="본문"><TextArea value={(d.body as string) || ''} onChange={(v) => setData({ body: v })} rows={2} /></Field>
+    </>
+  );
 }
 
 function OutroFields({ data: d, setData }: { data: TemplateData; setData: (patch: Partial<TemplateData>) => void }) {
@@ -575,12 +596,17 @@ function ImageTextFields({ data: d, setData }: { data: TemplateData; setData: (p
           </div>
         )}
       </Field>
-      <Field label="이미지 위치">
-        <select value={(d.imagePosition as string) || 'left'} onChange={(e) => setData({ imagePosition: e.target.value as 'left' | 'right' })}>
-          <option value="left">왼쪽</option>
-          <option value="right">오른쪽</option>
-        </select>
-      </Field>
+      <div className="property-row">
+        <Field label="이미지 위치">
+          <select value={(d.imagePosition as string) || 'left'} onChange={(e) => setData({ imagePosition: e.target.value as 'left' | 'right' })}>
+            <option value="left">왼쪽</option>
+            <option value="right">오른쪽</option>
+          </select>
+        </Field>
+        <Field label="이미지 비율 (%)">
+          <input type="number" value={d.imageSplit ?? 50} onChange={(e) => setData({ imageSplit: Math.max(20, Math.min(80, Number(e.target.value))) })} min={20} max={80} />
+        </Field>
+      </div>
     </>
   );
 }

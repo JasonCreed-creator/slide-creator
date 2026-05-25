@@ -148,6 +148,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
 
     case 'image-text': {
       const imgFirst = d.imagePosition !== 'right';
+      const imgPct = d.imageSplit ?? 50;
       const imgHtml = d.imageUrl
         ? `<div class="sl-img-box anim-item" data-anim="${imgFirst ? 'fadeLeft' : 'fadeRight'}"><img src="${esc(d.imageUrl)}" alt=""></div>`
         : `<div class="sl-img-box sl-img-placeholder anim-item" data-anim="${imgFirst ? 'fadeLeft' : 'fadeRight'}"></div>`;
@@ -156,7 +157,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
       <h3>${highlight(d.title || '', accent)}</h3>
       <p>${nl2br(d.body || '', accent)}</p>
     </div>`;
-      body = `<div class="sl-img-layout${imgFirst ? '' : ' reverse'}">
+      body = `<div class="sl-img-layout${imgFirst ? '' : ' reverse'}" style="grid-template-columns:${imgPct}fr ${100-imgPct}fr">
     ${imgFirst ? imgHtml + textHtml : textHtml + imgHtml}
   </div>`;
       break;
