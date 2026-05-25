@@ -174,6 +174,7 @@ function generateCss(kv: KeyVisual): string {
 :root{--accent:${accent};--primary:${primary};--secondary:${secondary};--bg:${bg};--font:${font}}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;font-family:var(--font)}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overflow:hidden}
+.bg-image{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
 #starCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 .deck{position:relative;z-index:2;width:100vw;height:100vh;overflow:hidden}
 .slide{position:absolute;inset:0;opacity:0;pointer-events:none;display:flex;flex-direction:column;transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1),filter .6s cubic-bezier(.22,1,.36,1)}
@@ -196,14 +197,14 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overf
 .slide.enter-zoom-out{opacity:0;transform:scale(1.2)}
 
 /* Navigation */
-#dotNav{position:fixed;top:28px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:3px;align-items:center;background:rgba(0,0,0,.5);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 6px}
-.dot{width:26px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(255,255,255,.35);cursor:pointer;border:none;background:none;border-radius:3px;font-family:var(--font);transition:all .2s}
-.dot:hover{color:#fff;background:rgba(255,255,255,.1)}
-.dot.active{color:#000;background:var(--accent);box-shadow:0 0 8px ${accent}80}
+#dotNav{position:fixed;top:28px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:3px;align-items:center;background:${bg}cc;backdrop-filter:blur(12px);border:1px solid ${primary}1a;border-radius:6px;padding:4px 6px}
+.dot{width:26px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:${primary}55;cursor:pointer;border:none;background:none;border-radius:3px;font-family:var(--font);transition:all .2s}
+.dot:hover{color:var(--primary);background:${primary}1a}
+.dot.active{color:var(--bg);background:var(--accent);box-shadow:0 0 8px ${accent}80}
 .nav-btns{position:fixed;bottom:24px;right:28px;z-index:10;display:flex;gap:6px}
-.nav-btn{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.4);backdrop-filter:blur(8px);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.nav-btn{width:40px;height:40px;border-radius:50%;border:1px solid ${primary}33;background:${bg}99;backdrop-filter:blur(8px);color:var(--primary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .nav-btn:hover{border-color:var(--accent);color:var(--accent)}
-.page-counter{position:fixed;bottom:30px;left:28px;z-index:10;font-size:12px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:3px}
+.page-counter{position:fixed;bottom:30px;left:28px;z-index:10;font-size:12px;font-weight:700;color:${primary}88;letter-spacing:3px}
 
 /* Animations */
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
@@ -229,7 +230,7 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overf
 
 /* Section Cover */
 .sl-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding-bottom:10%}
-.sl-cover-label{font-size:13px;font-weight:700;letter-spacing:6px;color:rgba(255,255,255,.35)}
+.sl-cover-label{font-size:13px;font-weight:700;letter-spacing:6px;color:${secondary}}
 .sl-cover-num{font-size:100px;font-weight:900;letter-spacing:-4px;line-height:.9;color:var(--accent);text-shadow:0 0 60px ${accent}66}
 .sl-cover-divider{width:1px;height:50px;background:linear-gradient(to bottom,var(--accent),transparent)}
 .sl-cover-title{font-size:80px;font-weight:800;letter-spacing:-2px;line-height:1;text-align:center}
@@ -340,18 +341,19 @@ function updateCounter(){
 
 function goSlide(i){
   if(i<0||i>=total)return;
-  if(i===cur){subStep=0;resetAnimItems(cur);return}
+  if(i===cur){return}
   var oldSlide=slides[cur];
   var newSlide=slides[i];
-  var trans=newSlide.dataset.transition||'fade';
-  oldSlide.classList.add('exit-'+trans);
-  newSlide.classList.add('enter-'+trans);
+  var exitTrans=oldSlide.dataset.transition||'fade';
+  var enterTrans=newSlide.dataset.transition||'fade';
+  oldSlide.classList.add('exit-'+exitTrans);
+  newSlide.classList.add('enter-'+enterTrans);
   resetAnimItems(i);
   void newSlide.offsetWidth;
   newSlide.classList.add('active');
-  newSlide.classList.remove('enter-'+trans);
+  newSlide.classList.remove('enter-'+enterTrans);
   setTimeout(function(){
-    oldSlide.classList.remove('active','exit-'+trans);
+    oldSlide.classList.remove('active','exit-'+exitTrans);
   },650);
   cur=i;subStep=0;
   dots.forEach(function(d,j){d.classList.toggle('active',j===cur)});
@@ -386,6 +388,7 @@ export function exportToHtml(project: Project): string {
   const kv = project.keyVisual;
   const css = generateCss(kv);
   const slidesHtml = project.slides.map((s, i) => renderSlideHtml(s, kv, i)).join('\n\n');
+  const bgImage = kv.backgroundImage ? `<img class="bg-image" src="${kv.backgroundImage}" alt="">` : '';
   const starfieldCanvas = project.starfield ? '<canvas id="starCanvas"></canvas>' : '';
   const starfieldJs = project.starfield ? generateStarfieldJs() : '';
   const navJs = generateNavJs(project.slides.length);
@@ -400,6 +403,7 @@ export function exportToHtml(project: Project): string {
 <style>${css}</style>
 </head>
 <body>
+${bgImage}
 ${starfieldCanvas}
 <div class="deck">
 ${slidesHtml}
