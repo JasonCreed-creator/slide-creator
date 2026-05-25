@@ -101,6 +101,15 @@ function DraggableOverlay({
     };
   }, [drag, ov.id, ov.width, ov.height, onDataChange, overlays, containerRef]);
 
+  const fxAnims: Record<string, string> = {
+    float: 'float 4s ease-in-out infinite',
+    'float-slow': 'floatSlow 7s ease-in-out infinite',
+    pulse: 'pulse 3s ease-in-out infinite',
+    glow: 'glowPulse 3s ease-in-out infinite',
+    breathe: 'breathe 4s ease-in-out infinite',
+    rotate: 'rotate360 20s linear infinite',
+  };
+
   const base: React.CSSProperties = {
     position: 'absolute',
     left: `${pos.x}%`,
@@ -113,6 +122,7 @@ function DraggableOverlay({
     outline: selected && onDataChange ? '2px solid var(--accent, #4f8cff)' : 'none',
     outlineOffset: 2,
     userSelect: 'none',
+    animation: ov.continuousEffect && ov.continuousEffect !== 'none' ? fxAnims[ov.continuousEffect] : undefined,
   };
 
   useEffect(() => {

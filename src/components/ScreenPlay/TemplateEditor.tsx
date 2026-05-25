@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
-import type { Slide, SlideTemplate, EntryAnimation, TransitionType, TemplateData, OverlayElement, ElementAnimation, BackgroundEffectType } from '@/types';
-import { TEMPLATE_LABELS, ELEMENT_ANIM_LABELS, BG_EFFECT_SLIDE_LABELS } from '@/types';
+import type { Slide, SlideTemplate, EntryAnimation, TransitionType, TemplateData, OverlayElement, ElementAnimation, BackgroundEffectType, ContinuousEffect } from '@/types';
+import { TEMPLATE_LABELS, ELEMENT_ANIM_LABELS, BG_EFFECT_SLIDE_LABELS, CONTINUOUS_EFFECT_LABELS } from '@/types';
 
 const TRANSITIONS: { value: TransitionType; label: string }[] = [
   { value: 'none', label: '없음' },
@@ -176,13 +176,22 @@ function OverlaySection({ slide }: { slide: Slide }) {
               <input type="number" value={ov.height} onChange={(e) => updateOverlay(ov.id, { height: Number(e.target.value) })} min={1} max={100} />
             </Field>
           </div>
-          <Field label="애니메이션">
-            <select value={ov.animation} onChange={(e) => updateOverlay(ov.id, { animation: e.target.value as ElementAnimation })}>
-              {Object.entries(ELEMENT_ANIM_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
-              ))}
-            </select>
-          </Field>
+          <div className="property-row">
+            <Field label="진입 애니메이션">
+              <select value={ov.animation} onChange={(e) => updateOverlay(ov.id, { animation: e.target.value as ElementAnimation })}>
+                {Object.entries(ELEMENT_ANIM_LABELS).map(([k, v]) => (
+                  <option key={k} value={k}>{v}</option>
+                ))}
+              </select>
+            </Field>
+            <Field label="지속 효과">
+              <select value={ov.continuousEffect || 'none'} onChange={(e) => updateOverlay(ov.id, { continuousEffect: e.target.value as ContinuousEffect })}>
+                {Object.entries(CONTINUOUS_EFFECT_LABELS).map(([k, v]) => (
+                  <option key={k} value={k}>{v}</option>
+                ))}
+              </select>
+            </Field>
+          </div>
           {ov.type === 'text' && (
             <>
               <Field label="내용">

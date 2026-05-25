@@ -60,6 +60,19 @@ export interface TimelineStep {
   highlight?: boolean;
 }
 
+export type ContinuousEffect = 'none' | 'float' | 'float-slow' | 'pulse' | 'glow' | 'shimmer' | 'rotate' | 'breathe';
+
+export const CONTINUOUS_EFFECT_LABELS: Record<ContinuousEffect, string> = {
+  none: '없음',
+  float: '떠다니기',
+  'float-slow': '느린 부유',
+  pulse: '펄스',
+  glow: '글로우',
+  shimmer: '쉬머',
+  rotate: '회전',
+  breathe: '호흡',
+};
+
 export interface OverlayElement {
   id: string;
   type: 'text' | 'shape' | 'image';
@@ -69,6 +82,7 @@ export interface OverlayElement {
   height: number;
   animation: ElementAnimation;
   animDelay: number;
+  continuousEffect?: ContinuousEffect;
   content: string;
   fontSize?: number;
   fontWeight?: number;

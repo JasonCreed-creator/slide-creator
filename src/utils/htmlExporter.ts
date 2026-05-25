@@ -19,19 +19,21 @@ function renderOverlaysHtml(overlays?: OverlayElement[]): string {
     const style = `position:absolute;left:${ov.x}%;top:${ov.y}%;width:${ov.width}%;height:${ov.height}%;opacity:${ov.opacity ?? 1};z-index:10;`;
     const animAttr = ov.animation && ov.animation !== 'none' ? ` data-anim="${ov.animation}"` : '';
     const delayAttr = ov.animDelay ? ` data-anim-delay="${ov.animDelay}"` : '';
+    const fxMap: Record<string, string> = { float: 'fx-float', 'float-slow': 'fx-float-slow', pulse: 'fx-pulse', glow: 'fx-glow', shimmer: 'fx-shimmer', rotate: 'fx-rotate', breathe: 'fx-breathe' };
+    const fxClass = ov.continuousEffect && ov.continuousEffect !== 'none' ? ' ' + (fxMap[ov.continuousEffect] || '') : '';
     if (ov.type === 'text') {
       const fs = ov.fontSize ?? 24;
       const fw = ov.fontWeight ?? 700;
       const color = ov.color ?? '#ffffff';
-      return `<div class="sl-overlay anim-item"${animAttr}${delayAttr} style="${style}font-size:${fs}px;font-weight:${fw};color:${color};display:flex;align-items:center;">${esc(ov.content)}</div>`;
+      return `<div class="sl-overlay anim-item${fxClass}"${animAttr}${delayAttr} style="${style}font-size:${fs}px;font-weight:${fw};color:${color};display:flex;align-items:center;">${esc(ov.content)}</div>`;
     }
     if (ov.type === 'shape') {
       const bg = ov.backgroundColor ?? 'rgba(79,140,255,0.3)';
       const br = ov.borderRadius ?? 8;
-      return `<div class="sl-overlay anim-item"${animAttr}${delayAttr} style="${style}background:${bg};border-radius:${br}px;"></div>`;
+      return `<div class="sl-overlay anim-item${fxClass}"${animAttr}${delayAttr} style="${style}background:${bg};border-radius:${br}px;"></div>`;
     }
     if (ov.type === 'image') {
-      return `<div class="sl-overlay anim-item"${animAttr}${delayAttr} style="${style}"><img src="${esc(ov.content)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:${ov.borderRadius ?? 0}px;"></div>`;
+      return `<div class="sl-overlay anim-item${fxClass}"${animAttr}${delayAttr} style="${style}"><img src="${esc(ov.content)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:${ov.borderRadius ?? 0}px;"></div>`;
     }
     return '';
   }).join('\n  ');
@@ -307,6 +309,22 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overf
 @keyframes typewriter{from{opacity:1;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
 .anim-item{opacity:0;transform:translateY(24px)}
 
+/* Continuous dynamic effects */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes floatSlow{0%,100%{transform:translate(0,0)}33%{transform:translate(5px,-8px)}66%{transform:translate(-4px,6px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 20px ${accent}33}50%{box-shadow:0 0 40px ${accent}66,0 0 80px ${accent}22}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes rotate360{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes breathe{0%,100%{opacity:0.6}50%{opacity:1}}
+.fx-float{animation:float 4s ease-in-out infinite}
+.fx-float-slow{animation:floatSlow 7s ease-in-out infinite}
+.fx-pulse{animation:pulse 3s ease-in-out infinite}
+.fx-glow{animation:glowPulse 3s ease-in-out infinite}
+.fx-shimmer{background:linear-gradient(90deg,transparent 25%,${accent}11 50%,transparent 75%);background-size:200% 100%;animation:shimmer 3s linear infinite}
+.fx-rotate{animation:rotate360 20s linear infinite}
+.fx-breathe{animation:breathe 4s ease-in-out infinite}
+
 /* Overlays */
 .sl-overlay{pointer-events:none}
 
@@ -334,7 +352,7 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overf
 .sl-cover-title{font-size:80px;font-weight:800;letter-spacing:-2px;line-height:1;text-align:center;text-shadow:0 2px 16px rgba(0,0,0,.25)}
 
 /* Two Column */
-.sl-two-col{position:absolute;top:24%;left:7%;right:7%;bottom:12%;display:grid;grid-template-columns:1fr 40px 1fr;gap:20px;align-items:center}
+.sl-two-col{position:absolute;top:24%;left:7%;right:7%;bottom:12%;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
 .sl-col{padding:32px 30px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);backdrop-filter:blur(12px);position:relative;min-height:280px;display:flex;flex-direction:column;border-radius:4px;box-shadow:0 4px 24px rgba(0,0,0,.2)}
 .sl-col::before{content:"";position:absolute;top:0;left:0;width:50px;height:3px;background:var(--accent)}
 .sl-col h3{font-size:32px;font-weight:800;line-height:1.2;margin-bottom:16px;letter-spacing:-.5px}
