@@ -5,14 +5,15 @@ import { ScreenLayoutEditor } from '@/components/ScreenLayout';
 import { KeyVisualEditor } from '@/components/KeyVisual';
 import { ScreenPlayEditor } from '@/components/ScreenPlay';
 import { SlidePreview } from '@/components/Preview';
+import { downloadHtml } from '@/utils/export';
 import './styles/global.css';
 
-const STEPS: { key: EditorStep; label: string; icon: string }[] = [
-  { key: 'screen', label: '스크린 규격', icon: '⬚' },
-  { key: 'layout', label: '스크린 구성', icon: '⊞' },
-  { key: 'keyvisual', label: '키비주얼', icon: '◆' },
-  { key: 'slides', label: '슬라이드', icon: '▦' },
-  { key: 'preview', label: '미리보기', icon: '▶' },
+const STEPS: { key: EditorStep; label: string }[] = [
+  { key: 'screen', label: '스크린 규격' },
+  { key: 'layout', label: '스크린 구성' },
+  { key: 'keyvisual', label: '키비주얼' },
+  { key: 'slides', label: '슬라이드' },
+  { key: 'preview', label: '미리보기' },
 ];
 
 function StepPanel() {
@@ -38,8 +39,13 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
+        <button className="btn-icon hamburger-btn" title="메뉴">≡</button>
         <h1 className="app-title">Slide Creator</h1>
         <span className="project-name">{project.name}</span>
+        <div style={{ flex: 1 }} />
+        <button className="btn-export" onClick={() => downloadHtml(project)}>
+          HTML 내보내기
+        </button>
       </header>
 
       <nav className="step-nav">
@@ -55,7 +61,7 @@ export default function App() {
         ))}
       </nav>
 
-      <main className="app-main">
+      <main className={`app-main ${editorStep === 'slides' ? 'app-main-flush' : ''}`}>
         <StepPanel />
       </main>
     </div>

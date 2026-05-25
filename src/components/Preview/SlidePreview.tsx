@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
 import { BackgroundRenderer } from '@/components/Effects';
+import { SlideContentRenderer } from './LivePreview';
 import type { TransitionType, ContentAnimationType } from '@/types';
 
 function getTransitionStyle(
@@ -27,48 +28,17 @@ function getTransitionStyle(
     'zoom-in': { opacity: 0, transform: phase === 'enter' ? 'scale(0.3)' : 'scale(1.5)' },
     'zoom-out': { opacity: 0, transform: phase === 'enter' ? 'scale(1.8)' : 'scale(0.3)' },
     cube: {
-      transform: phase === 'enter'
-        ? 'perspective(1200px) rotateY(90deg)'
-        : 'perspective(1200px) rotateY(-90deg)',
+      transform: phase === 'enter' ? 'perspective(1200px) rotateY(90deg)' : 'perspective(1200px) rotateY(-90deg)',
       opacity: phase === 'enter' ? 0 : 1,
       transformOrigin: phase === 'enter' ? 'left center' : 'right center',
     },
-    'flip-x': {
-      transform: phase === 'enter'
-        ? 'perspective(1200px) rotateY(180deg)'
-        : 'perspective(1200px) rotateY(-180deg)',
-      opacity: 0,
-    },
-    'flip-y': {
-      transform: phase === 'enter'
-        ? 'perspective(1200px) rotateX(180deg)'
-        : 'perspective(1200px) rotateX(-180deg)',
-      opacity: 0,
-    },
-    morph: {
-      opacity: 0,
-      transform: phase === 'enter' ? 'scale(0.8) rotate(5deg)' : 'scale(1.2) rotate(-5deg)',
-      filter: 'blur(6px)',
-    },
-    glitch: {
-      opacity: 0,
-      transform: phase === 'enter'
-        ? 'translateX(10px) skewX(5deg)'
-        : 'translateX(-10px) skewX(-5deg)',
-      filter: 'hue-rotate(90deg) saturate(2)',
-    },
-    'wipe-left': {
-      clipPath: phase === 'enter' ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)',
-      transition: 'clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
-    },
-    'wipe-right': {
-      clipPath: phase === 'enter' ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)',
-      transition: 'clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
-    },
-    iris: {
-      clipPath: phase === 'enter' ? 'circle(0% at 50% 50%)' : 'circle(0% at 50% 50%)',
-      transition: 'clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
-    },
+    'flip-x': { transform: phase === 'enter' ? 'perspective(1200px) rotateY(180deg)' : 'perspective(1200px) rotateY(-180deg)', opacity: 0 },
+    'flip-y': { transform: phase === 'enter' ? 'perspective(1200px) rotateX(180deg)' : 'perspective(1200px) rotateX(-180deg)', opacity: 0 },
+    morph: { opacity: 0, transform: phase === 'enter' ? 'scale(0.8) rotate(5deg)' : 'scale(1.2) rotate(-5deg)', filter: 'blur(6px)' },
+    glitch: { opacity: 0, transform: phase === 'enter' ? 'translateX(10px) skewX(5deg)' : 'translateX(-10px) skewX(-5deg)', filter: 'hue-rotate(90deg) saturate(2)' },
+    'wipe-left': { clipPath: phase === 'enter' ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)' },
+    'wipe-right': { clipPath: phase === 'enter' ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)' },
+    iris: { clipPath: 'circle(0% at 50% 50%)' },
   };
 
   return { ...base, ...styles[transition] };
@@ -113,14 +83,12 @@ export function SlidePreview() {
 
   const goNext = useCallback(() => {
     if (!hasSlides) return;
-    const next = currentIndex < slides.length - 1 ? currentIndex + 1 : 0;
-    transitionTo(next);
+    transitionTo(currentIndex < slides.length - 1 ? currentIndex + 1 : 0);
   }, [currentIndex, slides.length, hasSlides, transitionTo]);
 
   const goPrev = useCallback(() => {
     if (!hasSlides) return;
-    const prev = currentIndex > 0 ? currentIndex - 1 : slides.length - 1;
-    transitionTo(prev);
+    transitionTo(currentIndex > 0 ? currentIndex - 1 : slides.length - 1);
   }, [currentIndex, slides.length, hasSlides, transitionTo]);
 
   useEffect(() => {
@@ -128,17 +96,11 @@ export function SlidePreview() {
     const duration = slides[currentIndex]?.duration ?? 5000;
     setElapsed(0);
     const startTime = Date.now();
-
     const interval = window.setInterval(() => {
-      const now = Date.now();
-      const progress = Math.min((now - startTime) / duration, 1);
+      const progress = Math.min((Date.now() - startTime) / duration, 1);
       setElapsed(progress);
-      if (progress >= 1) {
-        clearInterval(interval);
-        goNext();
-      }
+      if (progress >= 1) { clearInterval(interval); goNext(); }
     }, 50);
-
     timerRef.current = interval;
     return () => clearInterval(interval);
   }, [isPlaying, currentIndex, hasSlides, slides, goNext]);
@@ -147,17 +109,8 @@ export function SlidePreview() {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goNext();
       if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goPrev();
-      if (e.key === ' ') {
-        e.preventDefault();
-        setIsPlaying((p) => !p);
-      }
-      if (e.key === 'Escape') {
-        if (isFullscreen) {
-          document.exitFullscreen?.();
-        } else {
-          setEditorStep('slides');
-        }
-      }
+      if (e.key === ' ') { e.preventDefault(); setIsPlaying((p) => !p); }
+      if (e.key === 'Escape') { isFullscreen ? document.exitFullscreen?.() : setEditorStep('slides'); }
       if (e.key === 'f' || e.key === 'F') toggleFullscreen();
     };
     window.addEventListener('keydown', handleKey);
@@ -165,65 +118,38 @@ export function SlidePreview() {
   }, [goNext, goPrev, setEditorStep, isFullscreen]);
 
   useEffect(() => {
-    const handleFSChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFSChange);
-    return () => document.removeEventListener('fullscreenchange', handleFSChange);
+    const h = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', h);
+    return () => document.removeEventListener('fullscreenchange', h);
   }, []);
 
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      containerRef.current.requestFullscreen();
-    }
+    document.fullscreenElement ? document.exitFullscreen() : containerRef.current.requestFullscreen();
   };
 
   const transition = currentSlide?.transition ?? 'fade';
-  const activeEffect = currentSlide?.backgroundEffect?.type !== 'none'
-    ? currentSlide?.backgroundEffect
-    : kv.backgroundEffect;
+  const bg = currentSlide?.backgroundColor === '__theme__' || !currentSlide?.backgroundColor
+    ? (kv.gradientCss || kv.backgroundColor)
+    : currentSlide.backgroundColor;
+  const effect = currentSlide?.backgroundEffect?.type !== 'none' ? currentSlide?.backgroundEffect : kv.backgroundEffect;
 
   return (
-    <div
-      ref={containerRef}
-      className={`preview-container ${isFullscreen ? 'preview-fullscreen' : ''}`}
-    >
+    <div ref={containerRef} className={`preview-container ${isFullscreen ? 'preview-fullscreen' : ''}`}>
       {!isFullscreen && (
         <div className="preview-toolbar">
-          <button className="btn-secondary" onClick={() => setEditorStep('slides')}>
-            ← 편집
-          </button>
+          <button className="btn-secondary" onClick={() => setEditorStep('slides')}>← 편집</button>
           <div className="preview-info">
-            <span className="preview-spec">
-              {project.screen.name} · {project.layout.name} · {kv.name}
-            </span>
+            <span className="preview-spec">{project.screen.name} · {project.layout.name} · {kv.name}</span>
           </div>
           <div className="preview-controls">
-            <button className="btn-icon" onClick={goPrev} disabled={!hasSlides} title="이전 (←)">
-              ◀
-            </button>
-            <button
-              className="btn-icon play-btn"
-              onClick={() => setIsPlaying((p) => !p)}
-              disabled={!hasSlides}
-              title="재생/정지 (Space)"
-            >
+            <button className="btn-icon" onClick={goPrev} disabled={!hasSlides}>◀</button>
+            <button className="btn-icon play-btn" onClick={() => setIsPlaying((p) => !p)} disabled={!hasSlides}>
               {isPlaying ? '⏸' : '▶'}
             </button>
-            <button className="btn-icon" onClick={goNext} disabled={!hasSlides} title="다음 (→)">
-              ▶
-            </button>
-            {hasSlides && (
-              <span className="slide-counter">
-                {currentIndex + 1} / {slides.length}
-              </span>
-            )}
-            <button className="btn-icon fullscreen-btn" onClick={toggleFullscreen} title="풀스크린 (F)">
-              ⛶
-            </button>
+            <button className="btn-icon" onClick={goNext} disabled={!hasSlides}>▶</button>
+            {hasSlides && <span className="slide-counter">{currentIndex + 1} / {slides.length}</span>}
+            <button className="btn-icon fullscreen-btn" onClick={toggleFullscreen}>⛶</button>
           </div>
         </div>
       )}
@@ -237,12 +163,7 @@ export function SlidePreview() {
               onClick={() => transitionTo(i)}
               title={`${slide.label} (${slide.duration / 1000}s)`}
             >
-              <div
-                className="timeline-fill"
-                style={{
-                  width: i === currentIndex ? `${elapsed * 100}%` : i < currentIndex ? '100%' : '0%',
-                }}
-              />
+              <div className="timeline-fill" style={{ width: i === currentIndex ? `${elapsed * 100}%` : i < currentIndex ? '100%' : '0%' }} />
               <span className="timeline-label">{i + 1}</span>
             </div>
           ))}
@@ -253,13 +174,13 @@ export function SlidePreview() {
         className="preview-screen"
         style={{
           aspectRatio: `${project.screen.widthPx} / ${project.screen.heightPx}`,
-          background: kv.gradientCss || kv.backgroundColor,
+          background: bg,
           color: kv.primaryColor,
           fontFamily: kv.fontFamily,
           perspective: '1200px',
         }}
       >
-        <BackgroundRenderer effect={activeEffect} />
+        <BackgroundRenderer effect={effect} />
 
         {project.layout.zones.map((zone) => (
           <div
@@ -267,10 +188,8 @@ export function SlidePreview() {
             className="preview-zone"
             style={{
               position: 'absolute',
-              left: `${zone.x}%`,
-              top: `${zone.y}%`,
-              width: `${zone.width}%`,
-              height: `${zone.height}%`,
+              left: `${zone.x}%`, top: `${zone.y}%`,
+              width: `${zone.width}%`, height: `${zone.height}%`,
             }}
           >
             <span className="zone-label">{zone.label}</span>
@@ -288,29 +207,15 @@ export function SlidePreview() {
                   : getTransitionStyle(transition, 'enter')
             }
           >
-            <div
-              key={animKey}
-              className={`slide-center-content ${transitionPhase === 'idle' ? getContentAnimClass(currentSlide.contentAnimation) : ''}`}
-            >
-              <h2 className="slide-title">{currentSlide.label}</h2>
-              {currentSlide.subtitle && (
-                <p className="slide-subtitle">{currentSlide.subtitle}</p>
-              )}
-              {currentSlide.transition !== 'none' && (
-                <span className="slide-transition-badge">{currentSlide.transition}</span>
-              )}
+            <div key={animKey} className={transitionPhase === 'idle' ? getContentAnimClass(currentSlide.contentAnimation) : ''} style={{ width: '100%', height: '100%' }}>
+              <SlideContentRenderer slide={currentSlide} />
             </div>
           </div>
         )}
 
         {!hasSlides && (
           <div className="preview-empty-overlay">
-            <p className="preview-empty-text">
-              현재 설정으로 스크린이 이렇게 보입니다
-            </p>
-            <p className="preview-empty-sub">
-              슬라이드를 추가하면 여기에 콘텐츠가 표시됩니다
-            </p>
+            <p className="preview-empty-text">슬라이드를 추가하면 여기에 콘텐츠가 표시됩니다</p>
           </div>
         )}
       </div>
@@ -318,13 +223,9 @@ export function SlidePreview() {
       {isFullscreen && hasSlides && (
         <div className="fullscreen-controls">
           <button className="btn-icon fs-btn" onClick={goPrev}>◀</button>
-          <button className="btn-icon fs-btn play-btn" onClick={() => setIsPlaying((p) => !p)}>
-            {isPlaying ? '⏸' : '▶'}
-          </button>
+          <button className="btn-icon fs-btn play-btn" onClick={() => setIsPlaying((p) => !p)}>{isPlaying ? '⏸' : '▶'}</button>
           <button className="btn-icon fs-btn" onClick={goNext}>▶</button>
-          <span className="fs-counter">
-            {currentIndex + 1} / {slides.length}
-          </span>
+          <span className="fs-counter">{currentIndex + 1} / {slides.length}</span>
           <span className="fs-label">{currentSlide?.label}</span>
         </div>
       )}
