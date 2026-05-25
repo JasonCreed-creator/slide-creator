@@ -17,6 +17,19 @@ export type SlideTemplate =
 
 export type EntryAnimation = 'none' | 'fadeUp' | 'fadeIn' | 'scaleIn';
 
+export type ElementAnimation = 'fadeUp' | 'fadeIn' | 'fadeLeft' | 'fadeRight' | 'scaleIn' | 'bounceIn' | 'typewriter' | 'none';
+
+export const ELEMENT_ANIM_LABELS: Record<ElementAnimation, string> = {
+  fadeUp: '아래에서 위로',
+  fadeIn: '페이드 인',
+  fadeLeft: '왼쪽에서',
+  fadeRight: '오른쪽에서',
+  scaleIn: '스케일 인',
+  bounceIn: '바운스',
+  typewriter: '타이프라이터',
+  none: '없음 (즉시)',
+};
+
 export type TransitionType =
   | 'none'
   | 'fade'
@@ -45,6 +58,24 @@ export interface TimelineStep {
   detail: string;
   metric?: string;
   highlight?: boolean;
+}
+
+export interface OverlayElement {
+  id: string;
+  type: 'text' | 'shape' | 'image';
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  animation: ElementAnimation;
+  animDelay: number;
+  content: string;
+  fontSize?: number;
+  fontWeight?: number;
+  color?: string;
+  backgroundColor?: string;
+  borderRadius?: number;
+  opacity?: number;
 }
 
 export interface TemplateData {
@@ -76,6 +107,7 @@ export interface TemplateData {
   videoUrl?: string;
   logoUrl?: string;
   contactInfo?: string;
+  overlays?: OverlayElement[];
 }
 
 export interface Slide {

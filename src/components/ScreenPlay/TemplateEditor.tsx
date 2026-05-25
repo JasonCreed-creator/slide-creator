@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
-import type { Slide, SlideTemplate, EntryAnimation, TransitionType, TemplateData } from '@/types';
-import { TEMPLATE_LABELS } from '@/types';
+import type { Slide, SlideTemplate, EntryAnimation, TransitionType, TemplateData, OverlayElement, ElementAnimation } from '@/types';
+import { TEMPLATE_LABELS, ELEMENT_ANIM_LABELS } from '@/types';
 
 const TRANSITIONS: { value: TransitionType; label: string }[] = [
   { value: 'none', label: '없음' },
@@ -105,6 +105,110 @@ export function TemplateEditor({ slide }: { slide: Slide }) {
         <p className="te-hint">**굵은 텍스트**로 감싸면 악센트 컬러로 강조됩니다</p>
         <TemplateFields template={slide.template} data={d} setData={setData} />
       </div>
+
+      <OverlaySection slide={slide} />
+    </div>
+  );
+}
+
+function OverlaySection({ slide }: { slide: Slide }) {
+  const { updateSlideData } = useProjectStore();
+  const overlays = slide.data.overlays || [];
+
+  const addOverlay = (type: OverlayElement['type']) => {
+    const base: OverlayElement = type === 'text'
+      ? { id: crypto.randomUUID(), type: 'text', x: 10, y: 10, width: 30, height: 10, animation: 'fadeUp', animDelay: 0, content: '텍스트', fontSize: 24, fontWeight: 700, color: '#ffffff', opacity: 1 }
+      : type === 'shape'
+        ? { id: crypto.randomUUID(), type: 'shape', x: 10, y: 10, width: 20, height: 20, animation: 'fadeIn', animDelay: 0, content: '', backgroundColor: 'rgba(79,140,255,0.3)', borderRadius: 8, opacity: 1 }
+        : { id: crypto.randomUUID(), type: 'image', x: 10, y: 10, width: 30, height: 20, animation: 'fadeIn', animDelay: 0, content: '', opacity: 1 };
+    updateSlideData(slide.id, { overlays: [...overlays, base] });
+  };
+
+  const updateOverlay = (id: string, patch: Partial<OverlayElement>) => {
+    updateSlideData(slide.id, {
+      overlays: overlays.map((o) => (o.id === id ? { ...o, ...patch } : o)),
+    });
+  };
+
+  const removeOverlay = (id: string) => {
+    updateSlideData(slide.id, { overlays: overlays.filter((o) => o.id !== id) });
+  };
+
+  return (
+    <div className="te-section">
+      <span className="te-section-title">오버레이 오브제</span>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+        <button className="btn-small" onClick={() => addOverlay('text')}>+ 텍스트</button>
+        <button className="btn-small" onClick={() => addOverlay('shape')}>+ 도형</button>
+        <button className="btn-small" onClick={() => addOverlay('image')}>+ 이미지</button>
+      </div>
+      {overlays.map((ov, i) => (
+        <div key={ov.id} className="te-card-edit">
+          <div className="te-card-header">
+            <span>{ov.type === 'text' ? '텍스트' : ov.type === 'shape' ? '도형' : '이미지'} {i + 1}</span>
+            <button className="btn-icon danger" onClick={() => removeOverlay(ov.id)}>&times;</button>
+          </div>
+          <div className="property-row">
+            <Field label="X (%)">
+              <input type="number" value={ov.x} onChange={(e) => updateOverlay(ov.id, { x: Number(e.target.value) })} min={0} max={100} />
+            </Field>
+            <Field label="Y (%)">
+              <input type="number" value={ov.y} onChange={(e) => updateOverlay(ov.id, { y: Number(e.target.value) })} min={0} max={100} />
+            </Field>
+          </div>
+          <div className="property-row">
+            <Field label="너비 (%)">
+              <input type="number" value={ov.width} onChange={(e) => updateOverlay(ov.id, { width: Number(e.target.value) })} min={1} max={100} />
+            </Field>
+            <Field label="높이 (%)">
+              <input type="number" value={ov.height} onChange={(e) => updateOverlay(ov.id, { height: Number(e.target.value) })} min={1} max={100} />
+            </Field>
+          </div>
+          <Field label="애니메이션">
+            <select value={ov.animation} onChange={(e) => updateOverlay(ov.id, { animation: e.target.value as ElementAnimation })}>
+              {Object.entries(ELEMENT_ANIM_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
+          </Field>
+          {ov.type === 'text' && (
+            <>
+              <Field label="내용">
+                <input type="text" value={ov.content} onChange={(e) => updateOverlay(ov.id, { content: e.target.value })} />
+              </Field>
+              <div className="property-row">
+                <Field label="글자 크기">
+                  <input type="number" value={ov.fontSize ?? 24} onChange={(e) => updateOverlay(ov.id, { fontSize: Number(e.target.value) })} min={8} max={200} />
+                </Field>
+                <Field label="글자 굵기">
+                  <input type="number" value={ov.fontWeight ?? 700} onChange={(e) => updateOverlay(ov.id, { fontWeight: Number(e.target.value) })} min={100} max={900} step={100} />
+                </Field>
+              </div>
+              <Field label="색상">
+                <input type="text" value={ov.color ?? '#ffffff'} onChange={(e) => updateOverlay(ov.id, { color: e.target.value })} />
+              </Field>
+            </>
+          )}
+          {ov.type === 'shape' && (
+            <>
+              <Field label="배경색">
+                <input type="text" value={ov.backgroundColor ?? 'rgba(79,140,255,0.3)'} onChange={(e) => updateOverlay(ov.id, { backgroundColor: e.target.value })} />
+              </Field>
+              <Field label="테두리 반경">
+                <input type="number" value={ov.borderRadius ?? 8} onChange={(e) => updateOverlay(ov.id, { borderRadius: Number(e.target.value) })} min={0} max={999} />
+              </Field>
+            </>
+          )}
+          {ov.type === 'image' && (
+            <Field label="이미지 URL">
+              <input type="text" value={ov.content} onChange={(e) => updateOverlay(ov.id, { content: e.target.value })} placeholder="https://..." />
+            </Field>
+          )}
+          <Field label="투명도">
+            <input type="number" value={ov.opacity ?? 1} onChange={(e) => updateOverlay(ov.id, { opacity: Number(e.target.value) })} min={0} max={1} step={0.1} />
+          </Field>
+        </div>
+      ))}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import type { Slide, KeyVisual, TemplateData } from '@/types';
+import type { Slide, KeyVisual, TemplateData, OverlayElement } from '@/types';
 
 function hl(text: string, accent: string): string {
   return text.replace(/\*\*(.+?)\*\*/g, `<b style="color:${accent};font-weight:800">$1</b>`);
@@ -44,10 +44,95 @@ export interface SlideRendererProps {
   onDataChange?: (patch: Partial<TemplateData>) => void;
 }
 
+function OverlayLayer({ overlays, onDataChange }: { overlays?: OverlayElement[]; onDataChange?: (patch: Partial<TemplateData>) => void }) {
+  if (!overlays || overlays.length === 0) return null;
+  return (
+    <>
+      {overlays.map((ov) => {
+        const base: React.CSSProperties = {
+          position: 'absolute',
+          left: `${ov.x}%`,
+          top: `${ov.y}%`,
+          width: `${ov.width}%`,
+          height: `${ov.height}%`,
+          opacity: ov.opacity ?? 1,
+          zIndex: 10,
+          pointerEvents: 'auto',
+        };
+
+        if (ov.type === 'text') {
+          const updateContent = onDataChange
+            ? (e: React.FocusEvent<HTMLDivElement>) => {
+                const newOverlays = overlays.map((o) =>
+                  o.id === ov.id ? { ...o, content: e.currentTarget.textContent || '' } : o,
+                );
+                onDataChange({ overlays: newOverlays });
+              }
+            : undefined;
+          return (
+            <div
+              key={ov.id}
+              style={{
+                ...base,
+                fontSize: ov.fontSize ?? 24,
+                fontWeight: ov.fontWeight ?? 700,
+                color: ov.color ?? '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              contentEditable={!!onDataChange}
+              suppressContentEditableWarning
+              onBlur={updateContent}
+              className={onDataChange ? 'sr-editable' : undefined}
+            >
+              {ov.content}
+            </div>
+          );
+        }
+
+        if (ov.type === 'shape') {
+          return (
+            <div
+              key={ov.id}
+              style={{
+                ...base,
+                backgroundColor: ov.backgroundColor ?? 'rgba(79,140,255,0.3)',
+                borderRadius: ov.borderRadius ?? 8,
+              }}
+            />
+          );
+        }
+
+        if (ov.type === 'image') {
+          return (
+            <div key={ov.id} style={base}>
+              {ov.content ? (
+                <img
+                  src={ov.content}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: ov.borderRadius ?? 0 }}
+                />
+              ) : (
+                <div style={{ width: '100%', height: '100%', border: '1px dashed rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'rgba(255,255,255,.3)' }}>
+                  IMAGE
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        return null;
+      })}
+    </>
+  );
+}
+
 export function SlideRenderer({ slide, kv, onDataChange }: SlideRendererProps) {
   const d = slide.data;
   const accent = kv.accentColor;
+  const overlays = d.overlays;
 
+  const templateContent = (() => {
   switch (slide.template) {
     case 'title':
       return (
@@ -355,4 +440,12 @@ export function SlideRenderer({ slide, kv, onDataChange }: SlideRendererProps) {
         </div>
       );
   }
+  })();
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {templateContent}
+      <OverlayLayer overlays={overlays} onDataChange={onDataChange} />
+    </div>
+  );
 }

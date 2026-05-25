@@ -499,8 +499,9 @@ export function exportToHtml(project: Project): string {
   const css = generateCss(kv);
   const slidesHtml = project.slides.map((s, i) => renderSlideHtml(s, kv, i)).join('\n\n');
   const bgImage = kv.backgroundImage ? `<img class="bg-image" src="${kv.backgroundImage}" alt="">` : '';
-  const starfieldCanvas = project.starfield ? '<canvas id="starCanvas"></canvas>' : '';
-  const starfieldJs = project.starfield ? generateStarfieldJs() : '';
+  const hasBgEffect = project.backgroundEffect && project.backgroundEffect !== 'none';
+  const starfieldCanvas = hasBgEffect ? '<canvas id="starCanvas"></canvas>' : '';
+  const starfieldJs = hasBgEffect ? generateStarfieldJs() : '';
   const navJs = generateNavJs(project.slides.length);
 
   return `<!DOCTYPE html>
