@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
-import type { TransitionType } from '@/types';
+import type { TransitionType, SlideContent, TextProps, ShapeProps, ImageProps } from '@/types';
 
 function getTransitionStyle(
   transition: TransitionType,
@@ -27,6 +27,74 @@ function getTransitionStyle(
   };
 
   return { ...base, ...hidden[transition] };
+}
+
+function PreviewContentItem({ content }: { content: SlideContent }) {
+  const style: React.CSSProperties = {
+    position: 'absolute',
+    left: `${content.x}%`,
+    top: `${content.y}%`,
+    width: `${content.width}%`,
+    height: `${content.height}%`,
+    opacity: content.opacity,
+    transform: content.rotation ? `rotate(${content.rotation}deg)` : undefined,
+    pointerEvents: 'none',
+  };
+
+  switch (content.type) {
+    case 'text': {
+      const p = content.props as TextProps;
+      return (
+        <div
+          style={{
+            ...style,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: p.textAlign === 'center' ? 'center' : p.textAlign === 'right' ? 'flex-end' : 'flex-start',
+            padding: '2%',
+          }}
+        >
+          <div
+            style={{
+              fontSize: `${p.fontSize}px`,
+              fontWeight: p.fontWeight,
+              color: p.color,
+              textAlign: p.textAlign,
+              width: '100%',
+              wordBreak: 'break-word',
+            }}
+          >
+            {p.text}
+          </div>
+        </div>
+      );
+    }
+    case 'image': {
+      const p = content.props as ImageProps;
+      return p.src ? (
+        <div style={style}>
+          <img
+            src={p.src}
+            style={{ width: '100%', height: '100%', objectFit: p.objectFit, borderRadius: '4px' }}
+            draggable={false}
+          />
+        </div>
+      ) : null;
+    }
+    case 'shape': {
+      const p = content.props as ShapeProps;
+      return (
+        <div
+          style={{
+            ...style,
+            background: p.fill,
+            border: p.strokeWidth ? `${p.strokeWidth}px solid ${p.strokeColor}` : 'none',
+            borderRadius: p.shapeType === 'circle' ? '50%' : `${p.borderRadius}px`,
+          }}
+        />
+      );
+    }
+  }
 }
 
 export function SlidePreview() {
@@ -139,49 +207,35 @@ export function SlidePreview() {
       {!isFullscreen && (
         <div className="preview-toolbar">
           <button className="btn-secondary" onClick={() => setEditorStep('slides')}>
-            ← 편집으로 돌아가기
+            &larr; 편집으로
           </button>
           <div className="preview-info">
             <span className="preview-spec">
-              {project.screen.name} · {project.layout.name} · {kv.name}
+              {project.screen.name} &middot; {project.layout.name} &middot; {kv.name}
             </span>
           </div>
           <div className="preview-controls">
-            <button
-              className="btn-icon"
-              onClick={goPrev}
-              disabled={!hasSlides}
-              title="이전 (←)"
-            >
-              ◀
+            <button className="btn-icon" onClick={goPrev} disabled={!hasSlides} title="이전">
+              &#x25C0;
             </button>
             <button
               className="btn-icon play-btn"
               onClick={() => setIsPlaying((p) => !p)}
               disabled={!hasSlides}
-              title="재생/정지 (Space)"
+              title="재생/정지"
             >
               {isPlaying ? '⏸' : '▶'}
             </button>
-            <button
-              className="btn-icon"
-              onClick={goNext}
-              disabled={!hasSlides}
-              title="다음 (→)"
-            >
-              ▶
+            <button className="btn-icon" onClick={goNext} disabled={!hasSlides} title="다음">
+              &#x25B6;
             </button>
             {hasSlides && (
               <span className="slide-counter">
                 {currentIndex + 1} / {slides.length}
               </span>
             )}
-            <button
-              className="btn-icon fullscreen-btn"
-              onClick={toggleFullscreen}
-              title="풀스크린 (F)"
-            >
-              ⛶
+            <button className="btn-icon fullscreen-btn" onClick={toggleFullscreen} title="풀스크린 (F)">
+              &#x26F6;
             </button>
           </div>
         </div>
@@ -212,7 +266,7 @@ export function SlidePreview() {
         className="preview-screen"
         style={{
           aspectRatio: `${project.screen.widthPx} / ${project.screen.heightPx}`,
-          background: kv.gradientCss || kv.backgroundColor,
+          background: currentSlide?.backgroundColor || kv.gradientCss || kv.backgroundColor,
           color: kv.primaryColor,
           fontFamily: kv.fontFamily,
         }}
@@ -244,44 +298,43 @@ export function SlidePreview() {
                   : getTransitionStyle(transition, 'enter')
             }
           >
-            <div className="slide-center-content">
-              <h2 className="slide-title">{currentSlide.label}</h2>
-              {currentSlide.transition !== 'none' && (
-                <span className="slide-transition-badge">{currentSlide.transition}</span>
-              )}
-            </div>
+            {currentSlide.contents.length > 0 ? (
+              currentSlide.contents.map((content) => (
+                <PreviewContentItem key={content.id} content={content} />
+              ))
+            ) : (
+              <div className="slide-center-content">
+                <h2 className="slide-title">{currentSlide.label}</h2>
+                {currentSlide.transition !== 'none' && (
+                  <span className="slide-transition-badge">{currentSlide.transition}</span>
+                )}
+              </div>
+            )}
           </div>
         )}
 
         {!hasSlides && (
           <div className="preview-empty-overlay">
-            <p className="preview-empty-text">
-              현재 설정으로 스크린이 이렇게 보입니다
-            </p>
-            <p className="preview-empty-sub">
-              슬라이드를 추가하면 여기에 콘텐츠가 표시됩니다
-            </p>
+            <p className="preview-empty-text">슬라이드를 추가하면 여기에 표시됩니다</p>
           </div>
         )}
       </div>
 
       {isFullscreen && hasSlides && (
         <div className="fullscreen-controls">
-          <button className="btn-icon fs-btn" onClick={goPrev}>◀</button>
+          <button className="btn-icon fs-btn" onClick={goPrev}>&#x25C0;</button>
           <button className="btn-icon fs-btn play-btn" onClick={() => setIsPlaying((p) => !p)}>
             {isPlaying ? '⏸' : '▶'}
           </button>
-          <button className="btn-icon fs-btn" onClick={goNext}>▶</button>
-          <span className="fs-counter">
-            {currentIndex + 1} / {slides.length}
-          </span>
+          <button className="btn-icon fs-btn" onClick={goNext}>&#x25B6;</button>
+          <span className="fs-counter">{currentIndex + 1} / {slides.length}</span>
           <span className="fs-label">{currentSlide?.label}</span>
         </div>
       )}
 
       {!isFullscreen && (
         <div className="preview-shortcuts">
-          <span>← → 슬라이드 이동</span>
+          <span>&larr; &rarr; 이동</span>
           <span>Space 재생/정지</span>
           <span>F 풀스크린</span>
           <span>Esc 편집으로</span>

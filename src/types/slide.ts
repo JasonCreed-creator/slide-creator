@@ -1,4 +1,27 @@
-export type ContentType = 'text' | 'image' | 'video' | 'shape' | 'timer' | 'logo';
+export type ContentType = 'text' | 'image' | 'shape';
+
+export interface TextProps {
+  text: string;
+  fontSize: number;
+  fontWeight: number;
+  textAlign: 'left' | 'center' | 'right';
+  color: string;
+}
+
+export interface ImageProps {
+  src: string;
+  objectFit: 'cover' | 'contain' | 'fill';
+}
+
+export interface ShapeProps {
+  shapeType: 'rectangle' | 'circle' | 'line';
+  fill: string;
+  strokeColor: string;
+  strokeWidth: number;
+  borderRadius: number;
+}
+
+export type ContentProps = TextProps | ImageProps | ShapeProps;
 
 export interface SlideContent {
   id: string;
@@ -8,8 +31,9 @@ export interface SlideContent {
   y: number;
   width: number;
   height: number;
-  props: Record<string, unknown>;
-  style: React.CSSProperties;
+  rotation: number;
+  opacity: number;
+  props: ContentProps;
 }
 
 export interface Slide {
@@ -19,6 +43,7 @@ export interface Slide {
   contents: SlideContent[];
   transition: TransitionType;
   duration: number;
+  backgroundColor?: string;
 }
 
 export type TransitionType =
