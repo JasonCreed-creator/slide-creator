@@ -11,4 +11,5 @@ export interface Project {
   layout: ScreenLayout;
   keyVisual: KeyVisual;
   slides: Slide[];
+  starfield: boolean;
 }

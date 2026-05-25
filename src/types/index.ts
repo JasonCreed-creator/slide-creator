@@ -1,4 +1,8 @@
 export type { ScreenSpec, ScreenZone, ScreenLayout } from './screen';
-export type { ContentType, TextProps, ImageProps, ShapeProps, ContentProps, SlideContent, Slide, TransitionType } from './slide';
+export type {
+  SlideTemplate, EntryAnimation, TransitionType,
+  MetricItem, CardItem, TemplateData, Slide,
+} from './slide';
+export { TEMPLATE_LABELS } from './slide';
 export type { KeyVisual } from './keyvisual';
 export type { Project } from './project';

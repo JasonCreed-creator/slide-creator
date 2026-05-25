@@ -531,7 +531,7 @@ input[type="range"] {
 
 .screenplay-editor {
   display: grid;
-  grid-template-columns: 260px 1fr 240px;
+  grid-template-columns: 260px 1fr;
   grid-template-rows: 1fr auto;
   gap: 0;
   height: 100%;
@@ -548,14 +548,9 @@ input[type="range"] {
 .screenplay-main {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: var(--bg-primary);
-}
-
-.screenplay-props {
-  border-left: 1px solid var(--border);
-  background: var(--bg-secondary);
   overflow-y: auto;
+  background: var(--bg-primary);
+  padding: 20px 28px;
 }
 
 .screenplay-footer {
@@ -565,6 +560,105 @@ input[type="range"] {
   padding: 10px 20px;
   border-top: 1px solid var(--border);
   background: var(--bg-secondary);
+}
+
+/* Add Slide Menu */
+.add-menu-wrap {
+  position: relative;
+}
+
+.add-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 200px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.add-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.add-menu-item:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.add-menu-icon {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent);
+  min-width: 24px;
+  text-align: center;
+}
+
+/* Template Editor */
+.template-editor {
+  max-width: 640px;
+}
+
+.te-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.te-section:last-child {
+  border-bottom: none;
+}
+
+.te-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.te-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.te-card-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-tertiary);
+}
+
+.te-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 /* Slide List */
