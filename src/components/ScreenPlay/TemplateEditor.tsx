@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
 import type { Slide, SlideTemplate, EntryAnimation, TransitionType, TemplateData } from '@/types';
 import { TEMPLATE_LABELS } from '@/types';
@@ -228,20 +229,7 @@ function TemplateFields({
       );
 
     case 'image-text':
-      return (
-        <>
-          <Field label="태그"><Input value={(d.tag as string) || ''} onChange={(v) => setData({ tag: v })} /></Field>
-          <Field label="제목"><Input value={(d.title as string) || ''} onChange={(v) => setData({ title: v })} /></Field>
-          <Field label="본문"><TextArea value={(d.body as string) || ''} onChange={(v) => setData({ body: v })} rows={3} /></Field>
-          <Field label="이미지 URL"><Input value={(d.imageUrl as string) || ''} onChange={(v) => setData({ imageUrl: v })} placeholder="https://..." /></Field>
-          <Field label="이미지 위치">
-            <select value={(d.imagePosition as string) || 'left'} onChange={(e) => setData({ imagePosition: e.target.value as 'left' | 'right' })}>
-              <option value="left">왼쪽</option>
-              <option value="right">오른쪽</option>
-            </select>
-          </Field>
-        </>
-      );
+      return <ImageTextFields data={d} setData={setData} />;
 
     case 'cards': {
       const cards = (d.cards as Array<{ title: string; body: string; highlight?: boolean }>) || [];
@@ -282,4 +270,51 @@ function TemplateFields({
     case 'blank':
       return <p className="te-hint">자유 편집 모드입니다. 미리보기에서 슬라이드 이름이 표시됩니다.</p>;
   }
+}
+
+function ImageTextFields({ data: d, setData }: { data: TemplateData; setData: (patch: Partial<TemplateData>) => void }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setData({ imageUrl: reader.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <>
+      <Field label="태그"><Input value={(d.tag as string) || ''} onChange={(v) => setData({ tag: v })} /></Field>
+      <Field label="제목"><Input value={(d.title as string) || ''} onChange={(v) => setData({ title: v })} /></Field>
+      <Field label="본문"><TextArea value={(d.body as string) || ''} onChange={(v) => setData({ body: v })} rows={3} /></Field>
+      <Field label="이미지">
+        <div className="image-upload-group">
+          <Input value={(d.imageUrl as string) || ''} onChange={(v) => setData({ imageUrl: v })} placeholder="https://... 또는 파일 업로드" />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleImageUpload}
+          />
+          <button className="btn-upload" onClick={() => fileInputRef.current?.click()}>파일 업로드</button>
+        </div>
+        {d.imageUrl && (
+          <div className="image-upload-thumb">
+            <img src={d.imageUrl} alt="미리보기" />
+            <button className="btn-icon danger" onClick={() => setData({ imageUrl: '' })}>&times;</button>
+          </div>
+        )}
+      </Field>
+      <Field label="이미지 위치">
+        <select value={(d.imagePosition as string) || 'left'} onChange={(e) => setData({ imagePosition: e.target.value as 'left' | 'right' })}>
+          <option value="left">왼쪽</option>
+          <option value="right">오른쪽</option>
+        </select>
+      </Field>
+    </>
+  );
 }
