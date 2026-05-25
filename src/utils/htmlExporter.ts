@@ -44,6 +44,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
   const bgStyle = bg ? `background:${bg};` : '';
   const activeClass = index === 0 ? ' active' : '';
   const transAttr = ` data-transition="${slide.transition || 'fade'}"`;
+  const bgEffectAttr = slide.backgroundEffect && slide.backgroundEffect !== 'none' ? ` data-bg-effect="${slide.backgroundEffect}"` : '';
   const overlaysHtml = renderOverlaysHtml(d.overlays);
 
   const tag = (text?: string) =>
@@ -246,7 +247,7 @@ function renderSlideHtml(slide: Slide, kv: KeyVisual, index: number): string {
       break;
   }
 
-  return `<section class="slide${activeClass}"${transAttr} style="${bgStyle}">
+  return `<section class="slide${activeClass}"${transAttr}${bgEffectAttr} style="${bgStyle}">
   ${body}
   ${overlaysHtml}
 </section>`;

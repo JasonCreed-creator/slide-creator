@@ -119,8 +119,20 @@ export interface Slide {
   transition: TransitionType;
   duration: number;
   backgroundColor?: string;
+  backgroundEffect?: BackgroundEffectType;
   entryAnimation: EntryAnimation;
 }
+
+export type BackgroundEffectType = 'starfield' | 'particles' | 'gradient-wave' | 'bokeh' | 'grid' | 'none';
+
+export const BG_EFFECT_SLIDE_LABELS: Record<BackgroundEffectType, string> = {
+  starfield: '스타필드',
+  particles: '파티클',
+  'gradient-wave': '웨이브',
+  bokeh: '보케',
+  grid: '그리드',
+  none: '없음',
+};
 
 export const TEMPLATE_LABELS: Record<SlideTemplate, string> = {
   'title': '타이틀',

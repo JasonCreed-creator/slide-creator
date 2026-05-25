@@ -248,7 +248,7 @@ export function ScreenPlayEditor() {
                   position: 'relative',
                 }}
               >
-                <BackgroundEffect effect={project.backgroundEffect} accentColor={kv.accentColor} />
+                <BackgroundEffect effect={activeSlide.backgroundEffect || project.backgroundEffect} accentColor={kv.accentColor} />
                 <SlideRenderer slide={activeSlide} kv={kv} onDataChange={handlePreviewDataChange} containerRef={previewContainerRef} />
               </div>
             </div>

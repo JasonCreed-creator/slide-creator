@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
-import type { Slide, SlideTemplate, EntryAnimation, TransitionType, TemplateData, OverlayElement, ElementAnimation } from '@/types';
-import { TEMPLATE_LABELS, ELEMENT_ANIM_LABELS } from '@/types';
+import type { Slide, SlideTemplate, EntryAnimation, TransitionType, TemplateData, OverlayElement, ElementAnimation, BackgroundEffectType } from '@/types';
+import { TEMPLATE_LABELS, ELEMENT_ANIM_LABELS, BG_EFFECT_SLIDE_LABELS } from '@/types';
 
 const TRANSITIONS: { value: TransitionType; label: string }[] = [
   { value: 'none', label: '없음' },
@@ -91,13 +91,25 @@ export function TemplateEditor({ slide }: { slide: Slide }) {
             />
           </Field>
         </div>
-        <Field label="배경색 (비워두면 테마 기본)">
-          <Input
-            value={slide.backgroundColor || ''}
-            onChange={(v) => updateSlide(slide.id, { backgroundColor: v || undefined })}
-            placeholder="#000000"
-          />
-        </Field>
+        <div className="property-row">
+          <Field label="배경색">
+            <Input
+              value={slide.backgroundColor || ''}
+              onChange={(v) => updateSlide(slide.id, { backgroundColor: v || undefined })}
+              placeholder="테마 기본"
+            />
+          </Field>
+          <Field label="배경 이펙트">
+            <select
+              value={slide.backgroundEffect || 'none'}
+              onChange={(e) => updateSlide(slide.id, { backgroundEffect: e.target.value as BackgroundEffectType })}
+            >
+              {Object.entries(BG_EFFECT_SLIDE_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
+          </Field>
+        </div>
       </div>
 
       <div className="te-section">

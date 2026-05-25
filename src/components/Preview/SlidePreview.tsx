@@ -147,7 +147,7 @@ export function SlidePreview() {
         color: kv.primaryColor, fontFamily: kv.fontFamily,
         overflow: 'hidden', position: 'relative',
       }}>
-        <BackgroundEffect effect={project.backgroundEffect} accentColor={kv.accentColor} />
+        <BackgroundEffect effect={currentSlide?.backgroundEffect || project.backgroundEffect} accentColor={kv.accentColor} />
         {kv.backgroundImage && (
           <img src={kv.backgroundImage} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, pointerEvents: 'none' }} />
         )}
