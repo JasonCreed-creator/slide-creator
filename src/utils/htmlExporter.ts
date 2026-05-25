@@ -192,14 +192,7 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--primary);overf
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes scaleIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
-.slide.active .anim-item:nth-child(1){animation:fadeUp .7s .1s both}
-.slide.active .anim-item:nth-child(2){animation:fadeUp .7s .25s both}
-.slide.active .anim-item:nth-child(3){animation:fadeUp .7s .4s both}
-.slide.active .anim-item:nth-child(4){animation:fadeUp .7s .55s both}
-.slide.active .anim-item:nth-child(5){animation:fadeUp .7s .7s both}
-.slide.active .anim-item:nth-child(6){animation:fadeUp .7s .85s both}
-.slide.active .anim-item:nth-child(7){animation:fadeUp .7s 1s both}
-.slide.active .anim-item:nth-child(8){animation:fadeUp .7s 1.15s both}
+.anim-item{opacity:0;transform:translateY(24px)}
 
 /* Tag */
 .sl-tag{display:inline-block;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:5px;padding:6px 14px;border:1px solid ${accent}66;border-radius:2px;background:${accent}0d;margin-bottom:18px}
@@ -294,16 +287,72 @@ function generateNavJs(total: number): string {
 const slides=document.querySelectorAll('.slide');
 const total=${total};
 let cur=0;
+let subStep=0;
 const dotNav=document.getElementById('dotNav');
 const pageCounter=document.getElementById('pageCounter');
-for(let i=0;i<total;i++){const d=document.createElement('button');d.className='dot'+(i===0?' active':'');d.textContent=String(i+1).padStart(2,'0');d.onclick=()=>go(i);dotNav.appendChild(d)}
+for(let i=0;i<total;i++){const d=document.createElement('button');d.className='dot'+(i===0?' active':'');d.textContent=String(i+1).padStart(2,'0');d.onclick=()=>goSlide(i);dotNav.appendChild(d)}
 const dots=dotNav.querySelectorAll('.dot');
-function go(i){if(i<0||i>=total||i===cur)return;slides[cur].classList.remove('active');cur=i;slides[cur].classList.add('active');dots.forEach((d,j)=>d.classList.toggle('active',j===cur));if(pageCounter)pageCounter.textContent=String(cur+1).padStart(2,'0')+' / '+String(total).padStart(2,'0')}
-document.getElementById('prevBtn').onclick=()=>go(cur-1);
-document.getElementById('nextBtn').onclick=()=>go(cur+1);
-document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(cur+1)}else if(e.key==='ArrowLeft')go(cur-1);else if(e.key==='f'||e.key==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen()}else if(e.key==='Home')go(0);else if(e.key==='End')go(total-1)});
-document.addEventListener('click',e=>{if(e.target.closest('button'))return;if(e.clientX>window.innerWidth/2)go(cur+1);else go(cur-1)});
-document.addEventListener('contextmenu',e=>{e.preventDefault();go(cur-1)});
+
+function getAnimItems(slideIdx){return slides[slideIdx].querySelectorAll('.anim-item')}
+
+function resetAnimItems(slideIdx){
+  const items=getAnimItems(slideIdx);
+  items.forEach(function(el){el.style.opacity='0';el.style.transform='translateY(24px)';el.style.animation='none'});
+}
+
+function revealItem(el){
+  el.style.animation='none';
+  void el.offsetWidth;
+  el.style.opacity='1';el.style.transform='translateY(0)';
+  el.style.transition='opacity .5s ease, transform .5s ease';
+}
+
+function revealAllItems(slideIdx){
+  const items=getAnimItems(slideIdx);
+  items.forEach(function(el){el.style.opacity='1';el.style.transform='translateY(0)';el.style.transition='none';el.style.animation='none'});
+}
+
+function hideItem(el){
+  el.style.opacity='0';el.style.transform='translateY(24px)';
+  el.style.transition='opacity .3s ease, transform .3s ease';
+}
+
+function updateCounter(){
+  if(pageCounter)pageCounter.textContent=String(cur+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');
+}
+
+function goSlide(i){
+  if(i<0||i>=total)return;
+  if(i===cur){subStep=0;resetAnimItems(cur);return}
+  slides[cur].classList.remove('active');
+  cur=i;subStep=0;
+  resetAnimItems(cur);
+  slides[cur].classList.add('active');
+  dots.forEach(function(d,j){d.classList.toggle('active',j===cur)});
+  updateCounter();
+}
+
+function advance(){
+  var items=getAnimItems(cur);
+  if(subStep<items.length){revealItem(items[subStep]);subStep++;return}
+  if(cur<total-1){goSlide(cur+1);advance()}
+}
+
+function stepBack(){
+  var items=getAnimItems(cur);
+  if(subStep>0){subStep--;hideItem(items[subStep]);return}
+  if(cur>0){goSlide(cur-1);var prevItems=getAnimItems(cur);subStep=prevItems.length;revealAllItems(cur)}
+}
+
+/* initialise first slide: hide all anim-items */
+resetAnimItems(0);
+slides[0].classList.add('active');
+
+document.getElementById('prevBtn').onclick=function(){stepBack()};
+document.getElementById('nextBtn').onclick=function(){advance()};
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'){e.preventDefault();advance()}else if(e.key==='ArrowLeft'){stepBack()}else if(e.key==='f'||e.key==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen()}else if(e.key==='Home'){goSlide(0)}else if(e.key==='End'){goSlide(total-1);revealAllItems(cur);subStep=getAnimItems(cur).length}});
+document.addEventListener('click',function(e){if(e.target.closest('button'))return;if(e.clientX>window.innerWidth/2)advance();else stepBack()});
+document.addEventListener('contextmenu',function(e){e.preventDefault();stepBack()});
 `;
 }
 
