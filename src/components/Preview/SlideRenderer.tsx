@@ -222,8 +222,8 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '0 7%' }}>
           <Tag text={d.tag} accent={accent} />
           {onDataChange
-            ? <h1 style={{ fontSize: 'clamp(24px, 5vw, 78px)', fontWeight: 800, lineHeight: 1.12, letterSpacing: -3, textAlign: 'center' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
-            : <h1 style={{ fontSize: 'clamp(24px, 5vw, 78px)', fontWeight: 800, lineHeight: 1.12, letterSpacing: -3, textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+            ? <h1 style={{ fontSize: 'clamp(24px, 5vw, 78px)', fontWeight: 800, lineHeight: 1.12, letterSpacing: -3, textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</h1>
+            : <h1 style={{ fontSize: 'clamp(24px, 5vw, 78px)', fontWeight: 800, lineHeight: 1.12, letterSpacing: -3, textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
           }
           {d.subtitle && (onDataChange
             ? <p style={{ fontSize: 'clamp(10px, 1.5vw, 20px)', fontWeight: 600, letterSpacing: 4, color: kv.secondaryColor, marginTop: 20, textAlign: 'center' }} {...editableProps(onDataChange, 'subtitle')}>{d.subtitle}</p>
@@ -236,11 +236,11 @@ export function SlideRenderer({ slide, kv, onDataChange, containerRef }: SlideRe
       return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 'clamp(8px, 1.5vw, 20px)' }}>
           <div style={{ fontSize: 'clamp(8px, 1vw, 13px)', fontWeight: 700, letterSpacing: 6, color: kv.secondaryColor }} {...editableProps(onDataChange, 'subtitle')}>{d.subtitle}</div>
-          <div style={{ fontSize: 'clamp(32px, 7vw, 100px)', fontWeight: 900, letterSpacing: -4, color: accent, lineHeight: .9, textShadow: `0 0 60px ${accent}66` }} {...editableProps(onDataChange, 'number')}>{d.number}</div>
+          <div style={{ fontSize: 'clamp(32px, 7vw, 100px)', fontWeight: 900, letterSpacing: -4, color: accent, lineHeight: .9, textShadow: `0 0 60px ${accent}66, 0 2px 12px rgba(0,0,0,0.3)` }} {...editableProps(onDataChange, 'number')}>{d.number}</div>
           <div style={{ width: 1, height: 'clamp(16px, 3vw, 50px)', background: `linear-gradient(to bottom, ${accent}, transparent)` }} />
           {onDataChange
-            ? <div style={{ fontSize: 'clamp(20px, 5vw, 80px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</div>
-            : <div style={{ fontSize: 'clamp(20px, 5vw, 80px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
+            ? <div style={{ fontSize: 'clamp(20px, 5vw, 80px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} {...editableProps(onDataChange, 'title')}>{d.title || ''}</div>
+            : <div style={{ fontSize: 'clamp(20px, 5vw, 80px)', fontWeight: 800, letterSpacing: -2, textAlign: 'center', textShadow: '0 2px 12px rgba(0,0,0,0.3)' }} dangerouslySetInnerHTML={{ __html: hl(d.title || '', accent) }} />
           }
         </div>
       );
